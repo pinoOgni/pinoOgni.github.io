@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C&#43;&#43; on Giuseppe Ognibene</title>
+    <link>https://pinoogni.github.io/tags/c&#43;&#43;/</link>
+    <description>Recent content in C&#43;&#43; on Giuseppe Ognibene</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright &amp;copy; 2021. Created by Giuseppe Ognibene, powered by Hugo, using the fantastic theme by [somrat](https://somrat.netlify.com)</copyright>
+    
+	<atom:link href="https://pinoogni.github.io/tags/c++/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Polycube</title>
+      <link>https://pinoogni.github.io/projects/polycube/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pinoogni.github.io/projects/polycube/</guid>
+      <description>Polycube is an open source software framework that provides fast and lightweight network functions such as bridges, routers, firewalls, and others.</description>
+    </item>
+    
+    <item>
+      <title>Virgilium Editor</title>
+      <link>https://pinoogni.github.io/projects/virgilium/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pinoogni.github.io/projects/virgilium/</guid>
+      <description>Virgilium Editor is the project of the System and Device Programming course of the year 2018/2019 from the Polytechnic of Turin.</description>
+    </item>
+    
+  </channel>
+</rss>
