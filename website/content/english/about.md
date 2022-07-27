@@ -41,11 +41,11 @@ experience:
       duration : "04/2017-09/2017"
       content : "The objective of the internship was the development of a connection between the Ubiatar application and a hardware device such as the combat robot, which during the internship, in the test and production phase has been replaced by a Raspberry with a breadboard on which a small one has been made hardwar project."
 
-pubblications:
+publications:
   enable : true
-  title : "PUBBLICATIONS"
-  pubblications_list:
-    # pubblication item loop
+  title : "PUBLICATIONS"
+  publications_list:
+    # publication item loop
     - name : "Creating Disaggregated Network Services with eBPF: the Kubernetes Network Provider Use Case"
       authors : "[Federico Parola](https://it.linkedin.com/in/federico-parola-5b496b200), [Leonardo Di Giovanna](https://www.linkedin.com/in/leonardo-di-giovanna-1a5453107/), Giuseppe Ognibene, [Fulvio Risso](https://fulvio.frisso.net/)"
       collection : "2022 IEEE 8th International Conference on Network Softwarization (NetSoft)"
