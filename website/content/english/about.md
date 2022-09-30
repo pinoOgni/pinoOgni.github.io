@@ -1,6 +1,6 @@
 ---
 title : "ABOUT ME"
-image : "images/backgrounds/pino-laurea.jpg"
+image : "images/backgrounds/pino_cv.jpg"
 # button
 
 # button:
