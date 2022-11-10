@@ -39,7 +39,7 @@ experience:
     - name : "Trainee Student - Ubiatar"
       company : "EFFE ERRE SRL"
       duration : "04/2017-09/2017"
-      content : "The objective of the internship was the development of a connection between the Ubiatar application and a hardware device such as the combat robot, which during the internship, in the test and production phase has been replaced by a Raspberry with a breadboard on which a small one has been made hardwar project."
+      content : "The objective of the internship was the development of a connection between the Ubiatar application and a hardware device such as the combat robot, which during the internship, in the test and production phase has been replaced by a Raspberry with a breadboard on which a small one has been made hardware project."
 
 publications:
   enable : true
