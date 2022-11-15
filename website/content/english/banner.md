@@ -13,7 +13,6 @@ occupations:
 # slider background image loop
 slider_images:
 - "images/slider/sea.jpg"
-- "images/slider/logo-in-progress.png"
 - "images/slider/giuseppe-lab.jpg"
 
 # button
