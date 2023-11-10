@@ -15,9 +15,13 @@ experience:
   title : "EXPERIENCE"
   experience_list:
     # experience item loop
+    - name : "Software Engineer"
+      company : "Rakuten Mobile Inc."
+      duration : "07/2023 - Today"
+    # experience item loop
     - name : "Research Fellow"
       company : "Polytechnic of Turin - DAUIN ([Netgroup](http://netgroup.polito.it/))"
-      duration : "05/2021 - today"
+      duration : "05/2021 - 07/2023"
     # experience item loop
     - name : "Thesis work (researcher)"
       company : "Polytechnic of Turin"
@@ -36,7 +40,7 @@ experience:
       content : "The work was focused on the introduction of backward compatible white-box monitoring for the cubes of the Polycube framework. I also had the chance to work with a nice team made up of various colleagues, PhD students and professors."
       
     # experience item loop
-    - name : "Trainee Student - Ubiatar"
+    - name : "Trainee Student - [Ubiatar](https://www.getapper.com/getapper-academy)"
       company : "EFFE ERRE SRL"
       duration : "04/2017-09/2017"
       content : "The objective of the internship was the development of a connection between the Ubiatar application and a hardware device such as the combat robot, which during the internship, in the test and production phase has been replaced by a Raspberry with a breadboard on which a small one has been made hardware project."
