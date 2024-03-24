@@ -4,7 +4,7 @@ skill_list:
 # skill item loop
 - name : "Programming and Scripting"
   image : "images/icons/development.png"
-  description: "C++, C, Python, Java, Bash, Qt"
+  description: "C++, C, Python, Bash, GO"
   
 # skill item loop
 - name : "Linux"
