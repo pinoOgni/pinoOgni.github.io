@@ -8,5 +8,40 @@
     <language>en-us</language>
     <copyright>Copyright &amp;copy; 2021. Created by Giuseppe Ognibene, powered by Hugo, using the fantastic theme by [somrat](https://somrat.netlify.com)</copyright>
     <atom:link href="https://pinoogni.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Angular</title>
+      <link>https://pinoogni.github.io/categories/angular/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/categories/angular/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>C&#43;&#43;</title>
+      <link>https://pinoogni.github.io/categories/c&#43;&#43;/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/categories/c&#43;&#43;/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>gRPC</title>
+      <link>https://pinoogni.github.io/categories/grpc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/categories/grpc/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Kubernetes</title>
+      <link>https://pinoogni.github.io/categories/kubernetes/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/categories/kubernetes/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Qt</title>
+      <link>https://pinoogni.github.io/categories/qt/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/categories/qt/</guid>
+      <description></description>
+    </item>
   </channel>
 </rss>
