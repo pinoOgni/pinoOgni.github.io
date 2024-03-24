@@ -84,9 +84,6 @@ link = "https://github.com/pinoOgni"
 icon = "fab fa-linkedin"
 link = "https://www.linkedin.com/in/giuseppe-ognibene-538930148/"
 
-[[params.social]]
-icon = "fas fa-envelope"
-link = "mailto:ognibenegiuseppe8@gmail.com"
 
 ################################### English language #####################################
 [Languages.en]

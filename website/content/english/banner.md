@@ -6,9 +6,8 @@ last_name : "Ognibene"
 bg_image : "images/backgrounds/full-nav-bg.jpg"
 # animated text loop
 occupations:
-- "Computer Engineer"
+- "Software Engineer"
 - "Open Source Develeper"
-- "Always a student, never a master"
 
 # slider background image loop
 slider_images:
