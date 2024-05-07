@@ -23,7 +23,7 @@ experience:
     - name : "Research Fellow"
       company : "Polytechnic of Turin - DAUIN ([Netgroup](http://netgroup.polito.it/))"
       duration : "05/2021 - 07/2023"
-      content: "I actively contributed to multiple projects, particularly focusing on Polycube. Additionally, I authored scientific articles, explored emerging technologies, and provided guidance to thesis students as a co-supervisor."
+      content: "I actively contributed to multiple projects, particularly focusing on Polycube. Additionally, I authored scientific articles, explored emerging technologies, and provided guidance to 3 thesis students as a co-supervisor ([Francesco Monaco](https://webthesis.biblio.polito.it/22792/), [Leonardo Di Giovanna](https://webthesis.biblio.polito.it/22615/), [Francesco Cappa](https://webthesis.biblio.polito.it/23609/)). During the second year I worked in a project between Rakuten Mobile Inc. and Polytechnic of Turin."
     # experience item loop
     - name : "Thesis work (researcher)"
       company : "Polytechnic of Turin"
