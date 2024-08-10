@@ -1,6 +1,6 @@
 ---
 title : "ABOUT ME"
-image : "images/backgrounds/pino_cv.jpg"
+image : "images/backgrounds/yokohama.png"
 # button
 
 # button:
@@ -17,8 +17,8 @@ experience:
     # experience item loop
     - name : "Software Engineer based in RCH, Setagaya City, Tokyo"
       company : "[Rakuten Mobile Inc.](https://www.linkedin.com/company/rakuten-mobile-network-inc/)"
-      duration : "07/2023 - Today"
-      content: "The role involves working on the development of various in-house software within the cloud-native domain, utilizing eBPF and associated technologies."
+      duration : "07/2023 - 07/2024"
+      content: "I was deeply involved in software development projects and I was managing Kubernetes clusters both in staging lab and on GCP to tests our software. As part of a company initiative, I had the opportunity to mentor four new graduates, aiding in their integration into the team."
     # experience item loop
     - name : "Research Fellow"
       company : "Polytechnic of Turin - DAUIN ([Netgroup](http://netgroup.polito.it/))"
