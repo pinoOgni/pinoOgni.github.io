@@ -4,7 +4,7 @@
     <title>Angular on Giuseppe Ognibene</title>
     <link>https://pinoogni.github.io/categories/angular/</link>
     <description>Recent content in Angular on Giuseppe Ognibene</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Copyright &amp;copy; 2021. Created by Giuseppe Ognibene, powered by Hugo, using the fantastic theme by [somrat](https://somrat.netlify.com)</copyright>
     <atom:link href="https://pinoogni.github.io/categories/angular/index.xml" rel="self" type="application/rss+xml" />
@@ -13,7 +13,7 @@
       <link>https://pinoogni.github.io/portfolio/virtuallabs/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://pinoogni.github.io/portfolio/virtuallabs/</guid>
-      <description>VirtualLabs is the project of the Internet Applications course of the academic year 2019/2020 of the Polytechnic of Turin.</description>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/pinoOgni/VirtualLabsFE&#34;&gt;VirtualLabs&lt;/a&gt; is the project of the Internet Applications course of the academic year 2019/2020 of the Polytechnic of Turin.&lt;/p&gt;&#xA;&lt;p&gt;VirtualLabs is a web application that is used to help teachers and students manage virtual laboratories.&lt;/p&gt;&#xA;&lt;h4 id=&#34;my-work-in-brief&#34;&gt;My work in brief&lt;/h4&gt;&#xA;&lt;p&gt;In this project I took care of the frontend part using Angular in particular:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;team management by a student (creation, acceptance / rejection of a request, viewing of requests)&lt;/li&gt;&#xA;&lt;li&gt;management of an assignment by a professor (creation, review, grade, historical view)&lt;/li&gt;&#xA;&lt;li&gt;management of an assignment by a student (version delivery, visualization and more)&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
     </item>
   </channel>
 </rss>
