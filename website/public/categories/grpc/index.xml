@@ -13,7 +13,7 @@
       <link>https://pinoogni.github.io/portfolio/polycube-grpc/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://pinoogni.github.io/portfolio/polycube-grpc/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/pinoOgni/polycube-grpc-service-libraries&#34;&gt;polycube-grpc-service-libraries&lt;/a&gt; allow the writing of a stand-alone Polycube service also in other languages.&lt;/p&gt;</description>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/pinoOgni/polycube-grpc-service-libraries&#34;&gt;polycube-grpc-service-libraries&lt;/a&gt; allow the writing of a stand-alone Polycube service also in other languages.&lt;/p&gt;&#xA;&lt;p&gt;Polycube services, called cubes, can be composed to build arbitrary service chains and provide custom network connectivity to namespaces, containers, virtual machines, and physical hosts.&lt;/p&gt;&#xA;&lt;h4 id=&#34;my-work-in-brief&#34;&gt;My work in brief&lt;/h4&gt;&#xA;&lt;p&gt;I have created an architecture that allows the creation of network services in Polycube using languages such as GO, Python, C++ and other languages supported by gRPC. GRPC was chosen because it offers the possibility of running the controlplane part of a service even on a remote machine, different from where the dataplane is run. The work done would make it easier to get more developers to the Polycube open-source project.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

@@ -4,7 +4,7 @@
     <title>Qt on Giuseppe Ognibene</title>
     <link>https://pinoogni.github.io/categories/qt/</link>
     <description>Recent content in Qt on Giuseppe Ognibene</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Copyright &amp;copy; 2021. Created by Giuseppe Ognibene, powered by Hugo, using the fantastic theme by [somrat](https://somrat.netlify.com)</copyright>
     <atom:link href="https://pinoogni.github.io/categories/qt/index.xml" rel="self" type="application/rss+xml" />
@@ -13,7 +13,7 @@
       <link>https://pinoogni.github.io/portfolio/virgilium/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://pinoogni.github.io/portfolio/virgilium/</guid>
-      <description>Virgilium Editor is the project of the System and Device Programming course of the year 2018/2019 from the Polytechnic of Turin.</description>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/pinoOgni/VirgiliumEditor&#34;&gt;Virgilium Editor&lt;/a&gt; is the project of the System and Device Programming course of the year 2018/2019 from the Polytechnic of Turin. In short, a real-time text editor based on the CRDT algorithm, developed using Qt(5.12.3).&lt;/p&gt;&#xA;&lt;h4 id=&#34;my-work-in-brief&#34;&gt;My work in brief&lt;/h4&gt;&#xA;&lt;p&gt;In this project I took care of both the frontend and the backend part using Qt. In the frontend I have implemented the login screens and the user&amp;rsquo;s personal page with all the management and viewing of files. In the backend I have implemented the part relating to user access, to save files with all related queries (using sqlite3).&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

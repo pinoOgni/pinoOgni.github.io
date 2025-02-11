@@ -4,7 +4,7 @@
     <title>Categories on Giuseppe Ognibene</title>
     <link>https://pinoogni.github.io/categories/</link>
     <description>Recent content in Categories on Giuseppe Ognibene</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Copyright &amp;copy; 2021. Created by Giuseppe Ognibene, powered by Hugo, using the fantastic theme by [somrat](https://somrat.netlify.com)</copyright>
     <atom:link href="https://pinoogni.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
@@ -23,7 +23,7 @@
       <description></description>
     </item>
     <item>
-      <title>gRPC</title>
+      <title>GRPC</title>
       <link>https://pinoogni.github.io/categories/grpc/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://pinoogni.github.io/categories/grpc/</guid>

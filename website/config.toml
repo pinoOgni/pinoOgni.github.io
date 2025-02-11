@@ -3,7 +3,8 @@ title = "Giuseppe Ognibene"
 theme = "somrat"
 
 # post pagination
-paginate = "6"
+[pagination]
+  pagerSize = 10
 # post excerpt
 summaryLength = "10"
 # disable language
@@ -69,6 +70,7 @@ logo_width = "150px"
 # Meta data
 description = "This is meta description"
 author = "pinoOgni"
+home = "Home"
 
 # Preloader
 [params.preloader]
@@ -91,7 +93,7 @@ languageName = "En"
 languageCode = "en-us"
 contentDir = "content/english"
 weight = 1
-home = "Home"
+
 # copyright
 copyright = "Copyright &copy; 2021. Created by Giuseppe Ognibene, powered by Hugo, using the fantastic theme by [somrat](https://somrat.netlify.com)"
 
