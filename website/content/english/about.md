@@ -15,6 +15,10 @@ experience:
   title : "EXPERIENCE"
   experience_list:
     # experience item loop
+    - name : "Software Engineer remote based."
+      company : "[Rakuten Mobile Inc.](https://www.linkedin.com/company/rakuten-mobile-network-inc/)"
+      duration : "10/2024 - Today"
+      content: "I develop cloud-native software leveraging eBPF for performance, security, and observability."
     - name : "Software Engineer based in RCH, Setagaya City, Tokyo"
       company : "[Rakuten Mobile Inc.](https://www.linkedin.com/company/rakuten-mobile-network-inc/)"
       duration : "07/2023 - 07/2024"
