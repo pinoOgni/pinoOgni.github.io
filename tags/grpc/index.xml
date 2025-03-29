@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>gRPC on Giuseppe Ognibene</title>
+    <title>GRPC on Giuseppe Ognibene</title>
     <link>https://pinoogni.github.io/tags/grpc/</link>
-    <description>Recent content in gRPC on Giuseppe Ognibene</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in GRPC on Giuseppe Ognibene</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <copyright>Copyright &amp;copy; 2021. Created by Giuseppe Ognibene, powered by Hugo, using the fantastic theme by [somrat](https://somrat.netlify.com)</copyright>
+    <lastBuildDate>Sat, 01 May 2021 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://pinoogni.github.io/tags/grpc/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Polycube and gRPC</title>
-      <link>https://pinoogni.github.io/projects/polycube-grpc/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://pinoogni.github.io/projects/polycube-grpc/</guid>
-      <description>polycube-grpc-service-libraries allow the writing of a stand-alone Polycube service also in other languages.</description>
+      <title>Polycube gRPC service libraries</title>
+      <link>https://pinoogni.github.io/projects/polycube-grpc-service-libraries/</link>
+      <pubDate>Sat, 01 May 2021 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/projects/polycube-grpc-service-libraries/</guid>
+      <description>&lt;h2 id=&#34;-polycube-grpc-service-libraries&#34;&gt;🌐 polycube-grpc-service-libraries &lt;a href=&#34;#-polycube-grpc-service-libraries&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/pinoOgni/polycube-grpc-service-libraries&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;polycube-grpc-service-libraries&lt;/a&gt; allows the creation of &lt;strong&gt;stand-alone Polycube services&lt;/strong&gt; in various programming languages using &lt;strong&gt;gRPC&lt;/strong&gt;.&lt;/p&gt;&#xA;&lt;p&gt;Polycube services, called &lt;strong&gt;cubes&lt;/strong&gt;, can be composed to build &lt;strong&gt;arbitrary service chains&lt;/strong&gt;, enabling &lt;strong&gt;custom network connectivity&lt;/strong&gt; for:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Namespaces&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Containers&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Virtual machines (VMs)&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Physical hosts&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;-my-work-in-brief&#34;&gt;🛠 My Work in Brief &lt;a href=&#34;#-my-work-in-brief&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;I developed an &lt;strong&gt;architecture&lt;/strong&gt; that allows the creation of &lt;strong&gt;network services&lt;/strong&gt; in &lt;strong&gt;Polycube&lt;/strong&gt; using languages like:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Go&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Python&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;C++&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;Other &lt;strong&gt;gRPC-supported languages&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;&lt;strong&gt;Why gRPC?&lt;/strong&gt;&lt;br&gt;&#xA;gRPC was chosen because it enables running the &lt;strong&gt;control plane&lt;/strong&gt; of a service on a &lt;strong&gt;remote machine&lt;/strong&gt;, separate from where the &lt;strong&gt;data plane&lt;/strong&gt; is running. This design improves &lt;strong&gt;flexibility&lt;/strong&gt; and &lt;strong&gt;scalability&lt;/strong&gt;.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>C&#43;&#43; on Giuseppe Ognibene</title>
-    <link>https://pinoogni.github.io/tags/c&#43;&#43;/</link>
-    <description>Recent content in C&#43;&#43; on Giuseppe Ognibene</description>
+    <title>EBPF on Giuseppe Ognibene</title>
+    <link>https://pinoogni.github.io/tags/ebpf/</link>
+    <description>Recent content in EBPF on Giuseppe Ognibene</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 01 May 2021 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://pinoogni.github.io/tags/c++/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 01 Oct 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://pinoogni.github.io/tags/ebpf/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ebpf-samples</title>
+      <link>https://pinoogni.github.io/projects/ebpf-samples/</link>
+      <pubDate>Tue, 01 Oct 2024 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/projects/ebpf-samples/</guid>
+      <description>&lt;h2 id=&#34;-ebpf-samples&#34;&gt;🐝 ebpf-samples &lt;a href=&#34;#-ebpf-samples&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The &lt;a href=&#34;https://github.com/pinoOgni/ebpf-samples&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ebpf-samples&lt;/a&gt; repo contains various examples to &lt;strong&gt;learn&lt;/strong&gt;, &lt;strong&gt;explore&lt;/strong&gt;, and &lt;strong&gt;experiment&lt;/strong&gt; with &lt;strong&gt;eBPF&lt;/strong&gt;.&lt;/p&gt;&#xA;&lt;h2 id=&#34;it-includes-various-hands-on-examples-covering-different-hook-points-such-as-tc-tracepoint-and-xdp-illustrating-use-cases-from-network-observability-to-performance-monitoring-these-examples-can-help-you-explore-ebpfs-capabilities&#34;&gt;It includes various hands-on examples covering different hook points such as TC, tracepoint, and XDP, illustrating use cases from network observability to performance monitoring. These examples can help you explore eBPF&amp;rsquo;s capabilities. &lt;a href=&#34;#it-includes-various-hands-on-examples-covering-different-hook-points-such-as-tc-tracepoint-and-xdp-illustrating-use-cases-from-network-observability-to-performance-monitoring-these-examples-can-help-you-explore-ebpfs-capabilities&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;</description>
+    </item>
     <item>
       <title>Polycube gRPC service libraries</title>
       <link>https://pinoogni.github.io/projects/polycube-grpc-service-libraries/</link>

@@ -2,42 +2,60 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://pinoogni.github.io/about/</loc>
-  </url><url>
-    <loc>https://pinoogni.github.io/categories/angular/</loc>
-  </url><url>
-    <loc>https://pinoogni.github.io/categories/c&#43;&#43;/</loc>
-  </url><url>
-    <loc>https://pinoogni.github.io/categories/</loc>
-  </url><url>
-    <loc>https://pinoogni.github.io/contact/</loc>
-  </url><url>
-    <loc>https://pinoogni.github.io/countries/</loc>
-  </url><url>
-    <loc>https://pinoogni.github.io/portfolio/crownlabs/</loc>
-  </url><url>
     <loc>https://pinoogni.github.io/</loc>
+    <lastmod>2025-03-29T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://pinoogni.github.io/categories/grpc/</loc>
+    <loc>https://pinoogni.github.io/about/</loc>
+    <lastmod>2025-03-29T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://pinoogni.github.io/banner/</loc>
+    <loc>https://pinoogni.github.io/tags/go/</loc>
+    <lastmod>2025-01-01T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://pinoogni.github.io/categories/kubernetes/</loc>
+    <loc>https://pinoogni.github.io/projects/netnscli/</loc>
+    <lastmod>2025-01-01T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://pinoogni.github.io/portfolio/polycube/</loc>
+    <loc>https://pinoogni.github.io/tags/network/</loc>
+    <lastmod>2025-01-01T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://pinoogni.github.io/portfolio/polycube-grpc/</loc>
-  </url><url>
-    <loc>https://pinoogni.github.io/portfolio/</loc>
-  </url><url>
-    <loc>https://pinoogni.github.io/categories/qt/</loc>
-  </url><url>
-    <loc>https://pinoogni.github.io/skill/</loc>
+    <loc>https://pinoogni.github.io/projects/</loc>
+    <lastmod>2025-01-01T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://pinoogni.github.io/tags/</loc>
+    <lastmod>2025-01-01T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://pinoogni.github.io/portfolio/virgilium/</loc>
+    <loc>https://pinoogni.github.io/tags/c/</loc>
+    <lastmod>2024-10-01T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://pinoogni.github.io/portfolio/virtuallabs/</loc>
+    <loc>https://pinoogni.github.io/tags/ebpf/</loc>
+    <lastmod>2024-10-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://pinoogni.github.io/projects/ebpf-samples/</loc>
+    <lastmod>2024-10-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://pinoogni.github.io/tags/c&#43;&#43;/</loc>
+    <lastmod>2021-05-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://pinoogni.github.io/tags/grpc/</loc>
+    <lastmod>2021-05-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://pinoogni.github.io/projects/polycube-grpc-service-libraries/</loc>
+    <lastmod>2021-05-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://pinoogni.github.io/projects/crownlabs/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://pinoogni.github.io/tags/grafana/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://pinoogni.github.io/tags/kubernetes/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://pinoogni.github.io/tags/prometheus/</loc>
+    <lastmod>2020-03-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://pinoogni.github.io/projects/polycube/</loc>
+    <lastmod>2019-06-01T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://pinoogni.github.io/categories/</loc>
   </url>
 </urlset>

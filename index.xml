@@ -1,19 +1,40 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>C&#43;&#43; on Giuseppe Ognibene</title>
-    <link>https://pinoogni.github.io/tags/c&#43;&#43;/</link>
-    <description>Recent content in C&#43;&#43; on Giuseppe Ognibene</description>
+    <title>Giuseppe Ognibene</title>
+    <link>https://pinoogni.github.io/</link>
+    <description>Recent content on Giuseppe Ognibene</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 01 May 2021 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://pinoogni.github.io/tags/c++/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 01 Jan 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://pinoogni.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Netnscli</title>
+      <link>https://pinoogni.github.io/projects/netnscli/</link>
+      <pubDate>Wed, 01 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/projects/netnscli/</guid>
+      <description>&lt;h2 id=&#34;-netnscli-lightweight-go-based-cli-tool&#34;&gt;🖥 Netnscli: Lightweight Go-based CLI Tool &lt;a href=&#34;#-netnscli-lightweight-go-based-cli-tool&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/pinoOgni/netnscli&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;strong&gt;Netnscli&lt;/strong&gt;&lt;/a&gt; is a &lt;strong&gt;lightweight Go-based CLI tool&lt;/strong&gt; built with &lt;strong&gt;Cobra&lt;/strong&gt;, designed to create and manage local network testbeds.&lt;/p&gt;&#xA;&lt;p&gt;All configurations are handled effortlessly via &lt;strong&gt;YAML files&lt;/strong&gt;, making it simple to set up and test different network topologies.&lt;/p&gt;&#xA;&lt;hr&gt;</description>
+    </item>
+    <item>
+      <title>ebpf-samples</title>
+      <link>https://pinoogni.github.io/projects/ebpf-samples/</link>
+      <pubDate>Tue, 01 Oct 2024 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/projects/ebpf-samples/</guid>
+      <description>&lt;h2 id=&#34;-ebpf-samples&#34;&gt;🐝 ebpf-samples &lt;a href=&#34;#-ebpf-samples&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The &lt;a href=&#34;https://github.com/pinoOgni/ebpf-samples&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ebpf-samples&lt;/a&gt; repo contains various examples to &lt;strong&gt;learn&lt;/strong&gt;, &lt;strong&gt;explore&lt;/strong&gt;, and &lt;strong&gt;experiment&lt;/strong&gt; with &lt;strong&gt;eBPF&lt;/strong&gt;.&lt;/p&gt;&#xA;&lt;h2 id=&#34;it-includes-various-hands-on-examples-covering-different-hook-points-such-as-tc-tracepoint-and-xdp-illustrating-use-cases-from-network-observability-to-performance-monitoring-these-examples-can-help-you-explore-ebpfs-capabilities&#34;&gt;It includes various hands-on examples covering different hook points such as TC, tracepoint, and XDP, illustrating use cases from network observability to performance monitoring. These examples can help you explore eBPF&amp;rsquo;s capabilities. &lt;a href=&#34;#it-includes-various-hands-on-examples-covering-different-hook-points-such-as-tc-tracepoint-and-xdp-illustrating-use-cases-from-network-observability-to-performance-monitoring-these-examples-can-help-you-explore-ebpfs-capabilities&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;</description>
+    </item>
     <item>
       <title>Polycube gRPC service libraries</title>
       <link>https://pinoogni.github.io/projects/polycube-grpc-service-libraries/</link>
       <pubDate>Sat, 01 May 2021 00:00:00 +0000</pubDate>
       <guid>https://pinoogni.github.io/projects/polycube-grpc-service-libraries/</guid>
       <description>&lt;h2 id=&#34;-polycube-grpc-service-libraries&#34;&gt;🌐 polycube-grpc-service-libraries &lt;a href=&#34;#-polycube-grpc-service-libraries&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/pinoOgni/polycube-grpc-service-libraries&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;polycube-grpc-service-libraries&lt;/a&gt; allows the creation of &lt;strong&gt;stand-alone Polycube services&lt;/strong&gt; in various programming languages using &lt;strong&gt;gRPC&lt;/strong&gt;.&lt;/p&gt;&#xA;&lt;p&gt;Polycube services, called &lt;strong&gt;cubes&lt;/strong&gt;, can be composed to build &lt;strong&gt;arbitrary service chains&lt;/strong&gt;, enabling &lt;strong&gt;custom network connectivity&lt;/strong&gt; for:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Namespaces&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Containers&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Virtual machines (VMs)&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Physical hosts&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;-my-work-in-brief&#34;&gt;🛠 My Work in Brief &lt;a href=&#34;#-my-work-in-brief&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;I developed an &lt;strong&gt;architecture&lt;/strong&gt; that allows the creation of &lt;strong&gt;network services&lt;/strong&gt; in &lt;strong&gt;Polycube&lt;/strong&gt; using languages like:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Go&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Python&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;C++&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;Other &lt;strong&gt;gRPC-supported languages&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;&lt;strong&gt;Why gRPC?&lt;/strong&gt;&lt;br&gt;&#xA;gRPC was chosen because it enables running the &lt;strong&gt;control plane&lt;/strong&gt; of a service on a &lt;strong&gt;remote machine&lt;/strong&gt;, separate from where the &lt;strong&gt;data plane&lt;/strong&gt; is running. This design improves &lt;strong&gt;flexibility&lt;/strong&gt; and &lt;strong&gt;scalability&lt;/strong&gt;.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Crownlabs</title>
+      <link>https://pinoogni.github.io/projects/crownlabs/</link>
+      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/projects/crownlabs/</guid>
+      <description>&lt;h2 id=&#34;-crownlabs-remote-computing-labs&#34;&gt;👨‍💻 CrownLabs: Remote Computing Labs &lt;a href=&#34;#-crownlabs-remote-computing-labs&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/netgroup-polito/CrownLabs&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CrownLabs&lt;/a&gt; is a set of services designed to deliver &lt;strong&gt;remote computing labs&lt;/strong&gt; through &lt;strong&gt;per-user environments&lt;/strong&gt; based on:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Virtual machines (VMs)&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Lightweight containers&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;This service was set up in &lt;strong&gt;about three weeks&lt;/strong&gt; by a group of &lt;strong&gt;MSc students&lt;/strong&gt; from the &lt;strong&gt;Polytechnic Institute of Turin&lt;/strong&gt; (Italy) under the pressure of &lt;strong&gt;COVID-19&lt;/strong&gt; in &lt;strong&gt;March 2020&lt;/strong&gt;.&lt;/p&gt;&#xA;&lt;p&gt;CrownLabs is &lt;strong&gt;currently developed&lt;/strong&gt;, &lt;strong&gt;maintained&lt;/strong&gt;, and &lt;strong&gt;operated&lt;/strong&gt; by a group of &lt;strong&gt;volunteers&lt;/strong&gt;, mainly MSc students in &lt;strong&gt;Computer Engineering&lt;/strong&gt; at the &lt;strong&gt;Polytechnic of Turin&lt;/strong&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Polycube</title>

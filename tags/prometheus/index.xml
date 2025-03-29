@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Prometheus on Giuseppe Ognibene</title>
+    <link>https://pinoogni.github.io/tags/prometheus/</link>
+    <description>Recent content in Prometheus on Giuseppe Ognibene</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 01 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://pinoogni.github.io/tags/prometheus/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Crownlabs</title>
+      <link>https://pinoogni.github.io/projects/crownlabs/</link>
+      <pubDate>Sun, 01 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/projects/crownlabs/</guid>
+      <description>&lt;h2 id=&#34;-crownlabs-remote-computing-labs&#34;&gt;👨‍💻 CrownLabs: Remote Computing Labs &lt;a href=&#34;#-crownlabs-remote-computing-labs&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/netgroup-polito/CrownLabs&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CrownLabs&lt;/a&gt; is a set of services designed to deliver &lt;strong&gt;remote computing labs&lt;/strong&gt; through &lt;strong&gt;per-user environments&lt;/strong&gt; based on:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Virtual machines (VMs)&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Lightweight containers&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;This service was set up in &lt;strong&gt;about three weeks&lt;/strong&gt; by a group of &lt;strong&gt;MSc students&lt;/strong&gt; from the &lt;strong&gt;Polytechnic Institute of Turin&lt;/strong&gt; (Italy) under the pressure of &lt;strong&gt;COVID-19&lt;/strong&gt; in &lt;strong&gt;March 2020&lt;/strong&gt;.&lt;/p&gt;&#xA;&lt;p&gt;CrownLabs is &lt;strong&gt;currently developed&lt;/strong&gt;, &lt;strong&gt;maintained&lt;/strong&gt;, and &lt;strong&gt;operated&lt;/strong&gt; by a group of &lt;strong&gt;volunteers&lt;/strong&gt;, mainly MSc students in &lt;strong&gt;Computer Engineering&lt;/strong&gt; at the &lt;strong&gt;Polytechnic of Turin&lt;/strong&gt;.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Polycube</title>
+      <link>https://pinoogni.github.io/projects/polycube/</link>
+      <pubDate>Sat, 01 Jun 2019 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/projects/polycube/</guid>
+      <description>&lt;h2 id=&#34;-polycube-open-source-network-framework&#34;&gt;🔷 Polycube: Open-Source Network Framework &lt;a href=&#34;#-polycube-open-source-network-framework&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/polycube-network/polycube&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Polycube&lt;/a&gt; is an &lt;strong&gt;open-source software framework&lt;/strong&gt; that provides &lt;strong&gt;fast and lightweight network functions&lt;/strong&gt; such as:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Bridges&lt;/li&gt;&#xA;&lt;li&gt;Routers&lt;/li&gt;&#xA;&lt;li&gt;Firewalls&lt;/li&gt;&#xA;&lt;li&gt;Other network services&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Polycube services, called &lt;strong&gt;cubes&lt;/strong&gt;, can be composed to build &lt;strong&gt;arbitrary service chains&lt;/strong&gt;, enabling &lt;strong&gt;custom network connectivity&lt;/strong&gt; for:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Namespaces&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Containers&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Virtual machines (VMs)&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Physical hosts&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;-my-work-in-brief&#34;&gt;🛠 My Work in Brief &lt;a href=&#34;#-my-work-in-brief&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;h3 id=&#34;-introducing-custom-metrics&#34;&gt;📊 &lt;strong&gt;Introducing Custom Metrics&lt;/strong&gt; &lt;a href=&#34;#-introducing-custom-metrics&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;I focused on implementing &lt;strong&gt;custom metrics&lt;/strong&gt;, defined in the &lt;strong&gt;YANG model&lt;/strong&gt; of each service. These metrics are collected and exposed via the &lt;strong&gt;&lt;code&gt;/metrics&lt;/code&gt; endpoint&lt;/strong&gt;, which is later read by &lt;strong&gt;Prometheus&lt;/strong&gt;.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
