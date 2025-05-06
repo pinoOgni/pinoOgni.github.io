@@ -1,26 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>C on Giuseppe Ognibene</title>
-    <link>https://pinoogni.github.io/tags/c/</link>
-    <description>Recent content in C on Giuseppe Ognibene</description>
+    <title>Articles on Giuseppe Ognibene</title>
+    <link>https://pinoogni.github.io/articles/</link>
+    <description>Recent content in Articles on Giuseppe Ognibene</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 11 Jun 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://pinoogni.github.io/tags/c/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://pinoogni.github.io/articles/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>eBPF Program Insights</title>
       <link>https://pinoogni.github.io/articles/ebpf-program-insights/</link>
       <pubDate>Wed, 11 Jun 2025 00:00:00 +0000</pubDate>
       <guid>https://pinoogni.github.io/articles/ebpf-program-insights/</guid>
       <description>&lt;div style=&#34;display: flex; justify-content: space-between; margin-bottom: 20px;&#34;&gt;&#xA;  &lt;img src=&#34;https://pinoogni.github.io/images/articles/ebpf-program-insights-2.png&#34; width=&#34;300&#34; style=&#34;margin-right: 20px;&#34; /&gt;&#xA;  &lt;img src=&#34;https://pinoogni.github.io/images/articles/ebpf-program-insights-1.png&#34; width=&#34;300&#34; /&gt;&#xA;&lt;/div&gt;&#xA;&lt;h2 id=&#34;introduction&#34;&gt;Introduction &lt;a href=&#34;#introduction&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;In this article we will see different ways to inspect an eBPF program in order to understand more about eBPF.&lt;/p&gt;&#xA;&lt;p&gt;This article is intended for developers who already have basic familiarity with eBPF programs and want to explore how to inspect compiled &lt;code&gt;.o&lt;/code&gt; files using different tools. Some knowledge of Go, C, and tools for working with eBPF in Go (such as &lt;code&gt;bpf2go&lt;/code&gt;) will be helpful.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>ebpf-samples</title>
-      <link>https://pinoogni.github.io/projects/ebpf-samples/</link>
-      <pubDate>Tue, 01 Oct 2024 00:00:00 +0000</pubDate>
-      <guid>https://pinoogni.github.io/projects/ebpf-samples/</guid>
-      <description>&lt;h2 id=&#34;-ebpf-samples&#34;&gt;🐝 ebpf-samples &lt;a href=&#34;#-ebpf-samples&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The &lt;a href=&#34;https://github.com/pinoOgni/ebpf-samples&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ebpf-samples&lt;/a&gt; repo contains various examples to &lt;strong&gt;learn&lt;/strong&gt;, &lt;strong&gt;explore&lt;/strong&gt;, and &lt;strong&gt;experiment&lt;/strong&gt; with &lt;strong&gt;eBPF&lt;/strong&gt;.&lt;/p&gt;&#xA;&lt;p&gt;It includes various hands-on examples covering different hook points such as TC, tracepoint, and XDP, illustrating use cases from network observability to performance monitoring. These examples can help you explore eBPF&amp;rsquo;s capabilities.&lt;/p&gt;&#xA;&lt;img src=&#34;https://pinoogni.github.io/images/projects/ebpf-samples_logo.png&#34; width=&#34;200&#34; /&gt;&#xA;&lt;hr&gt;</description>
     </item>
   </channel>
 </rss>

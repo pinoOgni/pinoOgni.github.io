@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>eBPF Program Insights | Giuseppe Ognibene</title>
+
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
+<meta name="viewport" content="width=device-width,minimum-scale=1">
+<meta name="description" content="eBPF Program Insights">
+<meta name="generator" content="Hugo 0.136.2">
+
+
+  <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+
+ 
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-K9PB8E59SW"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-K9PB8E59SW');
+        }
+      </script>
+
+
+
+
+
+
+
+  </head>
+
+  <body>
+    <nav class="navigation">
+	
+		<a href="/"> <span class="arrow">←</span>Home</a>
+	
+	<a href="/about">About</a>
+	<a href="/projects">Projects</a>
+	<a href="/articles">Articles</a>
+	<a href="/tags">Tags</a>
+
+	
+
+	
+</nav>
+
+
+    <main class="main">
+      
+
+<section id="single">
+    <h1 class="title">eBPF Program Insights</h1>
+
+    <div class="tip">
+        <time datetime="2025-06-11 00:00:00 &#43;0000 UTC">2025</time>
+        <span class="split">
+          ·
+        </span>
+        <span>
+          4017 words
+        </span>
+        <span class="split">
+          ·
+        </span>
+        <span>
+          19 minute read
+        </span>
+    </div>
+
+    
+    
+        
+  
+    <aside class="toc">
+      <details>
+          <summary>Table of Contents
+          </summary>
+          <div>
+              <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#key-considerations">Key Considerations</a></li>
+    <li><a href="#tools">Tools</a>
+      <ul>
+        <li><a href="#using-bpftool-recommended-for-ebpf">Using <code>bpftool</code> (Recommended for eBPF)</a></li>
+        <li><a href="#using-readelf">Using <code>readelf</code></a></li>
+        <li><a href="#using-llvm-objdump-for-ebpf-bytecode">Using <code>llvm-objdump</code> (For eBPF bytecode)</a></li>
+      </ul>
+    </li>
+    <li><a href="#example">Example</a>
+      <ul>
+        <li><a href="#bpftool"><code>bpftool</code></a></li>
+        <li><a href="#readelf"><code>readelf</code></a></li>
+        <li><a href="#llvm-objdump">llvm-objdump</a></li>
+      </ul>
+    </li>
+    <li><a href="#summary">Summary</a></li>
+    <li><a href="#references">References</a></li>
+  </ul>
+</nav>
+          </div>
+      </details>
+    </aside>
+  
+
+
+    
+
+
+    <div class="content">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+  <img src="/images/articles/ebpf-program-insights-2.png" width="300" style="margin-right: 20px;" />
+  <img src="/images/articles/ebpf-program-insights-1.png" width="300" />
+</div>
+<h2 id="introduction">Introduction <a href="#introduction" class="anchor">🔗</a></h2><p>In this article we will see different ways to inspect an eBPF program in order to understand more about eBPF.</p>
+<p>This article is intended for developers who already have basic familiarity with eBPF programs and want to explore how to inspect compiled <code>.o</code> files using different tools. Some knowledge of Go, C, and tools for working with eBPF in Go (such as <code>bpf2go</code>) will be helpful.</p>
+<p>The program includes everything we need to inspect it and understand its various components:</p>
+<ul>
+<li>A function</li>
+<li>A global variable</li>
+<li>An eBPF map</li>
+<li>Some BPF helpers</li>
+<li>The license</li>
+</ul>
+<h2 id="key-considerations">Key Considerations <a href="#key-considerations" class="anchor">🔗</a></h2><p>An eBPF program, when compiled, becomes an ELF (Executable and Linkable Format) object file (.o), which contains not only bytecode, but also maps, global variables, metadata, and other sections.</p>
+<p>We are using the <code>cilium/ebpf</code> library, which utilizes <code>bpf2go</code>, as described in the <a href="https://github.com/cilium/ebpf/" target="_blank" rel="noopener">cilium/ebpf GitHub repo</a>: <em><code>cmd/bpf2go</code>: allows compiling and embedding eBPF programs written in C within Go code. As well as compiling the C code, it auto-generates Go code for loading and manipulating the eBPF program and map objects.</em></p>
+<p>The <code>.o</code> files generation are influenced by a specific set of Clang flags:</p>
+<ul>
+<li><strong>-O2</strong> ensures the code is optimized, improving its chances of passing the eBPF verifier by simplifying control flow and removing dead code.</li>
+<li><strong>-mcpu=v1</strong> guarantees compatibility with older kernels by avoiding newer eBPF instructions that might not be supported.</li>
+<li><strong>-g</strong>  enables debug information, which is required to generate <strong>BTF (BPF Type Format)</strong> metadata.</li>
+</ul>
+<p><strong>Symbol stripping is performed by default unless explicitly disabled</strong>. This affects tools like <code>readelf</code> and <code>llvm-objdump</code>, as debug and symbol information may be missing.</p>
+<p>These defaults ensure portability and compatibility with tooling, but they also mean that a <code>.o</code> file compiled using <code>bpf2go</code> might differ from one compiled manually, especially in terms of section layout and available metadata. We can inspect the default compilation behavior <a href="https://github.com/cilium/ebpf/blob/main/cmd/bpf2go/gen/compile.go" target="_blank" rel="noopener">here</a>.</p>
+<p>For instance, if we manually compile our XDP program using <code>clang -g -O2 -Wall --target=bpf -I../../headers -c xdp.c -o xdp.o</code>, and compare the output of <code>readelf -S xdp.o</code> with <code>readelf -S bpf_bpfel.o</code> (the <code>bpf_bpfel.o</code> file is created using <code>bpf2go</code>), we will notice differences in the presence of <code>.debug_*</code> sections and symbol metadata.</p>
+<p>By default, <code>bpf2go</code> strips the debug information using <code>cmd = exec.Command(args.Strip, &quot;-g&quot;, args.Dest)</code> (<a href="https://github.com/cilium/ebpf/blob/main/cmd/bpf2go/gen/compile.go#L86" target="_blank" rel="noopener">here</a>) producing smaller and cleaner ELF files optimized for loading into the kernel. However, if we want to explore the ELF structure in more detail (e.g., for analysis or learning), we can preserve this information by passing the <code>-no-strip</code> flag to <code>bpf2go</code> in the <code>.go</code> file: <code>//go:generate go run github.com/cilium/ebpf/cmd/bpf2go -no-strip bpf xdp.c -- -I../../headers</code>. This way, all debug symbols and metadata are retained for inspection.</p>
+<p><strong>Anyway, here we are using the stripped version, i.e., the default one.</strong></p>
+<h2 id="tools">Tools <a href="#tools" class="anchor">🔗</a></h2><p>To inspect and read an eBPF <code>.o</code> file, we can use tools like <code>bpftool</code>, <code>readelf</code> and <code>llvm-objdump</code>.</p>
+<p>Before we dive into the tools, here’s a quick reminder of some common ELF sections we&rsquo;ll see in eBPF <code>.o</code> files:</p>
+<ul>
+<li><strong>.text</strong>: Contains the actual eBPF instructions.</li>
+<li><strong>.rodata</strong>: Read-only data, like constants defined in the C program.</li>
+<li><strong>.bss</strong>: Uninitialized global/static variables, typically zero-initialized at runtime.</li>
+<li><strong>.data</strong>: Initialized global/static variables.</li>
+<li><strong>.maps</strong>: Definitions of eBPF maps used by the program.</li>
+</ul>
+<p>Understanding these will help make sense of what each tool reveals.</p>
+<h3 id="using-bpftool-recommended-for-ebpf">Using <code>bpftool</code> (Recommended for eBPF) <a href="#using-bpftool-recommended-for-ebpf" class="anchor">🔗</a></h3><p><a href="https://github.com/libbpf/bpftool" target="_blank" rel="noopener">bpftool</a> allows for inspection and simple modification of BPF objects on the system (this is the most common definition).
+We can use it to do many powerful things, such as inspect loaded eBPF programs, map contents, BTF information, and even pin or detach programs from the kernel.</p>
+<p>The <a href="https://docs.cilium.io/en/latest/reference-guides/bpf/architecture/#instruction-set" target="_blank" rel="noopener">BPF and XDP Reference Guide from Cilium</a> provides valuable insights into the BPF instruction set and can help interpret bpftool outputs. The following points are quoted from the official documentation and describe the purpose of the BPF registers:</p>
+<ul>
+<li>Register <strong>r10</strong> is the only register which is read-only and contains the frame pointer address in order to access the BPF stack space. The remaining <strong>r0 - r9</strong> registers are general purpose and of read/write nature.</li>
+<li><strong>r0</strong> contains the return value of a helper function call.</li>
+<li><strong>r1 - r5</strong> hold arguments from the BPF program to the kernel helper function.</li>
+<li><strong>r6 - r9</strong> are callee saved registers that will be preserved on helper function call.</li>
+</ul>
+<h3 id="using-readelf">Using <code>readelf</code> <a href="#using-readelf" class="anchor">🔗</a></h3><p><code>readelf</code> is a command-line tool for displaying information about ELF files, such as section headers, symbols, and relocation entries, making it especially useful when analyzing compiled eBPF object files. In brief <code>readelf</code> helps examining ELF headers and section names. We will focus on two commands.</p>
+<p>The <code>readelf -S program.o</code> command displays all sections, including: <code>.text</code> (code), <code>maps</code>, <code>license</code> and so on.</p>
+<p>The <code>readelf -s program.o</code> command lists function names and symbols defined inside the object file.</p>
+<h3 id="using-llvm-objdump-for-ebpf-bytecode">Using <code>llvm-objdump</code> (For eBPF bytecode) <a href="#using-llvm-objdump-for-ebpf-bytecode" class="anchor">🔗</a></h3><p>Because <code>objdump</code> may not support eBPF instructions, <code>llvm-objdump</code> (LLVM’s object file dumper) is usually a better choice. It prints the contents of object files and final linked images named on the command line. We will see only the <code>llvm-objdump -S program.o</code> command which shows the disassembled code alongside the corresponding source lines.</p>
+<h2 id="example">Example <a href="#example" class="anchor">🔗</a></h2><p>The <a href="https://github.com/pinoOgni/ebpf-samples/tree/main/program_insights/xdp" target="_blank" rel="noopener">example program</a> is a simple XDP probe that counts the number of IPv4 packets on the loopback interface. It checks if it is Ethernet, IPv4 and not malformed. The controlplane reads the value from an eBPF array map. The counter of IPv4 packets is stored in a eBPF map and also in a global variable.</p>
+<p>How to build it:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cd ebpf-samples
+</span></span><span style="display:flex;"><span>make build TARGET=program_insights/xdp
+</span></span></code></pre></div><p>How to run it:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>sudo ./program_insights/xdp/bin/xdp
+</span></span></code></pre></div><h3 id="bpftool"><code>bpftool</code> <a href="#bpftool" class="anchor">🔗</a></h3><p>Let&rsquo;s see the <code>bpftool prog</code> command syntax:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>sudo bpftool prog help
+</span></span><span style="display:flex;"><span>Usage: bpftool prog { show <span style="color:#666">|</span> list } [PROG]
+</span></span><span style="display:flex;"><span>       bpftool prog dump xlated PROG [{ file FILE <span style="color:#666">|</span> [opcodes] [linum] [visual] }]
+</span></span><span style="display:flex;"><span>       bpftool prog dump jited  PROG [{ file FILE <span style="color:#666">|</span> [opcodes] [linum] }]
+</span></span><span style="display:flex;"><span>PROG :<span style="color:#666">=</span> { id PROG_ID <span style="color:#666">|</span> pinned FILE <span style="color:#666">|</span> tag PROG_TAG <span style="color:#666">|</span> name PROG_NAME }
+</span></span></code></pre></div><p>In particular we will use <code>sudo bpftool prog show</code> which shows information about loaded programs and <code>bpftool prog dump xlated PROG</code> which dumps the translated version of our eBPF program. It shows a human-readable, disassembled form of the BPF instructions, as seen by the verifier, i.e., after the kernel has applied its own rewrites. This is not the raw BPF bytecode, nor is it JIT-compiled machine code.</p>
+<p>Note: we can use tag of the eBPF program that is automatically generated based on its instructions; this helps us uniquely identify and compare programs, even across systems. Also because the program name alone isn&rsquo;t guaranteed to be unique or preserved when loading into the kernel.</p>
+<p>For our example, we have:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>sudo bpftool prog show
+</span></span><span style="display:flex;"><span><span style="color:#666">...</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">326</span>: xdp  name xdp_func  tag <span style="color:#666">16</span>fbe55eb9bf1e18  gpl
+</span></span><span style="display:flex;"><span>	loaded_at <span style="color:#666">2025</span><span style="color:#666">-</span><span style="color:#666">05</span><span style="color:#666">-</span><span style="color:#666">31</span>T16:<span style="color:#666">05</span>:<span style="color:#666">29</span><span style="color:#666">+</span><span style="color:#666">0200</span>  uid <span style="color:#666">0</span>
+</span></span><span style="display:flex;"><span>	xlated <span style="color:#666">384</span>B  jited <span style="color:#666">233</span>B  memlock <span style="color:#666">4096</span>B  map_ids <span style="color:#666">62</span>,<span style="color:#666">63</span>,<span style="color:#666">64</span>
+</span></span><span style="display:flex;"><span>	btf_id <span style="color:#666">298</span>
+</span></span></code></pre></div><p>And here is the output of the <code>dump xlated </code>command, with some comments on the right-hand side:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>sudo bpftool prog dump xlated tag <span style="color:#666">16</span>fbe55eb9bf1e18
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#d2413a;font-weight:bold">int</span> xdp_func(struct xdp_md <span style="color:#666">*</span>ctx):
+</span></span><span style="display:flex;"><span>; <span style="color:#d2413a;font-weight:bold">int</span> xdp_func(struct xdp_md <span style="color:#666">*</span>ctx) {
+</span></span><span style="display:flex;"><span>   <span style="color:#666">0</span>: (b7) r0 <span style="color:#666">=</span> <span style="color:#666">2</span>   <span style="color:#666">--&gt;</span> set default <span style="color:#a2f;font-weight:bold">return</span> value (XDP_PASS) as defined <span style="color:#a2f;font-weight:bold">in</span> common<span style="color:#666">.</span>h
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; void <span style="color:#666">*</span>data_end <span style="color:#666">=</span> (void<span style="color:#666">*</span>)(long)ctx<span style="color:#666">-&gt;</span>data_end;
+</span></span><span style="display:flex;"><span>   <span style="color:#666">1</span>: (<span style="color:#666">79</span>) r2 <span style="color:#666">=</span> <span style="color:#666">*</span>(u64 <span style="color:#666">*</span>)(r1 <span style="color:#666">+</span><span style="color:#666">8</span>)   <span style="color:#666">--&gt;</span> <span style="color:#a2f">load</span> data_end from ctx<span style="color:#666">-&gt;</span>data_end
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; void <span style="color:#666">*</span>data <span style="color:#666">=</span> (void<span style="color:#666">*</span>)(long)ctx<span style="color:#666">-&gt;</span>data;
+</span></span><span style="display:flex;"><span>   <span style="color:#666">2</span>: (<span style="color:#666">79</span>) r1 <span style="color:#666">=</span> <span style="color:#666">*</span>(u64 <span style="color:#666">*</span>)(r1 <span style="color:#666">+</span><span style="color:#666">0</span>)   <span style="color:#666">--&gt;</span> <span style="color:#a2f">load</span> data from ctx<span style="color:#666">-&gt;</span>data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; <span style="color:#a2f;font-weight:bold">if</span> ((void <span style="color:#666">*</span>)(eth <span style="color:#666">+</span> <span style="color:#666">1</span>) <span style="color:#666">&gt;</span> data_end) {
+</span></span><span style="display:flex;"><span>   <span style="color:#666">3</span>: (bf) r3 <span style="color:#666">=</span> r1    <span style="color:#666">--&gt;</span> r3 <span style="color:#666">=</span> data (start of packet)
+</span></span><span style="display:flex;"><span>   <span style="color:#666">4</span>: (<span style="color:#666">07</span>) r3 <span style="color:#666">+=</span> <span style="color:#666">14</span>   <span style="color:#666">--&gt;</span> r3 <span style="color:#666">=</span> data <span style="color:#666">+</span> sizeof(struct ethhdr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; <span style="color:#a2f;font-weight:bold">if</span> ((void <span style="color:#666">*</span>)(eth <span style="color:#666">+</span> <span style="color:#666">1</span>) <span style="color:#666">&gt;</span> data_end)
+</span></span><span style="display:flex;"><span>   <span style="color:#666">5</span>: (<span style="color:#666">2</span>d) <span style="color:#a2f;font-weight:bold">if</span> r3 <span style="color:#666">&gt;</span> r2 goto pc<span style="color:#666">+</span><span style="color:#666">41</span>    <span style="color:#666">--&gt;</span> drop <span style="color:#a2f;font-weight:bold">if</span> out<span style="color:#666">-</span>of<span style="color:#666">-</span>bounds
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; <span style="color:#a2f;font-weight:bold">if</span> (eth<span style="color:#666">-&gt;</span>h_proto <span style="color:#666">!=</span> bpf_htons(ETH_P_IP))
+</span></span><span style="display:flex;"><span>   <span style="color:#666">6</span>: (<span style="color:#666">69</span>) r3 <span style="color:#666">=</span> <span style="color:#666">*</span>(u16 <span style="color:#666">*</span>)(r1 <span style="color:#666">+</span><span style="color:#666">12</span>)    <span style="color:#666">--&gt;</span> <span style="color:#a2f">load</span> eth<span style="color:#666">-&gt;</span>h_proto (EtherType)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; <span style="color:#a2f;font-weight:bold">if</span> (eth<span style="color:#666">-&gt;</span>h_proto <span style="color:#666">!=</span> bpf_htons(ETH_P_IP))
+</span></span><span style="display:flex;"><span>   <span style="color:#666">7</span>: (<span style="color:#666">55</span>) <span style="color:#a2f;font-weight:bold">if</span> r3 <span style="color:#666">!=</span> <span style="color:#666">0x8</span> goto pc<span style="color:#666">+</span><span style="color:#666">39</span>    <span style="color:#666">--&gt;</span> check <span style="color:#a2f;font-weight:bold">for</span> IPv4 (<span style="color:#666">0x0800</span> <span style="color:#a2f;font-weight:bold">in</span> network order is <span style="color:#666">0x0008</span>)
+</span></span><span style="display:flex;"><span>   <span style="color:#666">8</span>: (<span style="color:#666">07</span>) r1 <span style="color:#666">+=</span> <span style="color:#666">34</span>   <span style="color:#666">--&gt;</span> advance to <span style="color:#d2413a;font-weight:bold">IP</span> header (<span style="color:#666">14</span> <span style="color:#a2f;font-weight:bold">for</span> struct ethhdr <span style="color:#666">+</span> <span style="color:#666">20</span> offset <span style="color:#a2f;font-weight:bold">for</span> struct iphdr)
+</span></span><span style="display:flex;"><span>   <span style="color:#666">9</span>: (<span style="color:#666">2</span>d) <span style="color:#a2f;font-weight:bold">if</span> r1 <span style="color:#666">&gt;</span> r2 goto pc<span style="color:#666">+</span><span style="color:#666">37</span>    <span style="color:#666">--&gt;</span> bounds check again
+</span></span><span style="display:flex;"><span>  <span style="color:#666">10</span>: (b7) r1 <span style="color:#666">=</span> <span style="color:#666">0</span>   <span style="color:#666">--&gt;</span> clear the r1 register
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; u32 key <span style="color:#666">=</span> <span style="color:#666">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#666">11</span>: (<span style="color:#666">63</span>) <span style="color:#666">*</span>(u32 <span style="color:#666">*</span>)(r10 <span style="color:#666">-</span><span style="color:#666">4</span>) <span style="color:#666">=</span> r1    <span style="color:#666">--&gt;</span> r10 is pointing to the top of the stack; 
+</span></span><span style="display:flex;"><span>                                    r10 <span style="color:#666">-</span> <span style="color:#666">4</span> means that we are reserving <span style="color:#666">4</span> bytes; r1 was <span style="color:#666">0</span>; 
+</span></span><span style="display:flex;"><span>                                    so we are storing a <span style="color:#666">32</span> bit value <span style="color:#666">0</span> from r1 at the 
+</span></span><span style="display:flex;"><span>                                    memory location r10 <span style="color:#666">-</span> <span style="color:#666">4</span> <span style="color:#a2f;font-weight:bold">in</span> the ebpf stack
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">12</span>: (b7) r6 <span style="color:#666">=</span> <span style="color:#666">1</span>   <span style="color:#666">--&gt;</span> r6 <span style="color:#666">=</span> <span style="color:#666">1</span> (initial value)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; u64 initval <span style="color:#666">=</span> <span style="color:#666">1</span>, <span style="color:#666">*</span>valp;
+</span></span><span style="display:flex;"><span>  <span style="color:#666">13</span>: (<span style="color:#666">7</span>b) <span style="color:#666">*</span>(u64 <span style="color:#666">*</span>)(r10 <span style="color:#666">-</span><span style="color:#666">16</span>) <span style="color:#666">=</span> r6   <span style="color:#666">--&gt;</span> we<span style="color:#b44">&#39;re using the stack to store initval (value = 1)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">14</span>: (bf) r2 <span style="color:#666">=</span> r10   <span style="color:#666">--&gt;</span> prepare pointer (we<span style="">’</span>ll soon point to key, <span style="color:#a2f;font-weight:bold">not</span> initval yet<span style="color:#666">!</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#666">15</span>: (<span style="color:#666">07</span>) r2 <span style="color:#666">+=</span> <span style="color:#666">-</span><span style="color:#666">4</span>   <span style="color:#666">--&gt;</span> r2 now points to key (stored at r10 <span style="color:#666">-</span> <span style="color:#666">4</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; valp <span style="color:#666">=</span> bpf_map_lookup_elem(<span style="color:#666">&amp;</span>counter, <span style="color:#666">&amp;</span>key); <span style="color:#666">--&gt;</span> remember that the map used is a BPF_MAP_TYPE_ARRAY
+</span></span><span style="display:flex;"><span>                                              <span style="color:#666">--&gt;</span> afaiu, the bpf verifier decides it can <span style="color:#a2f;font-weight:bold">do</span> zero<span style="color:#666">-</span>cost 
+</span></span><span style="display:flex;"><span>                                              lookup instead of calling the helper;
+</span></span><span style="display:flex;"><span>                                              that<span style="color:#b44">&#39;s because we are using an array as map. </span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">16</span>: (<span style="color:#666">18</span>) r1 <span style="color:#666">=</span> map[id:<span style="color:#666">98</span>]          <span style="color:#666">--&gt;</span> <span style="color:#a2f">load</span> map pointer (counter map)
+</span></span><span style="display:flex;"><span>  <span style="color:#666">18</span>: (<span style="color:#666">07</span>) r1 <span style="color:#666">+=</span> <span style="color:#666">336</span>                <span style="color:#666">--&gt;</span> this should be like an internal map offset; 
+</span></span><span style="display:flex;"><span>                                    so the array actually start after this <span style="color:#666">336</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">19</span>: (<span style="color:#666">61</span>) r0 <span style="color:#666">=</span> <span style="color:#666">*</span>(u32 <span style="color:#666">*</span>)(r2 <span style="color:#666">+</span><span style="color:#666">0</span>)     <span style="color:#666">--&gt;</span> remember line <span style="color:#666">15</span>; now we are loading the key value (<span style="color:#666">0</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#666">20</span>: (<span style="color:#666">35</span>) <span style="color:#a2f;font-weight:bold">if</span> r0 <span style="color:#666">&gt;=</span> <span style="color:#666">0x1</span> goto pc<span style="color:#666">+</span><span style="color:#666">3</span>   <span style="color:#666">--&gt;</span> check bounds; <span style="color:#a2f;font-weight:bold">for</span> an array map of size <span style="color:#666">1</span>; 
+</span></span><span style="display:flex;"><span>                                    <span style="color:#a2f;font-weight:bold">if</span> key <span style="color:#666">&gt;=</span> <span style="color:#666">1</span> jumps ahead <span style="color:#a2f;font-weight:bold">and</span> <span style="color:#a2f;font-weight:bold">return</span> NULL; 
+</span></span><span style="display:flex;"><span>                                    here key is <span style="color:#666">0</span>, so it<span style="color:#b44">&#39;s safe and we can continue</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">21</span>: (<span style="color:#666">67</span>) r0 <span style="color:#666">&lt;&lt;=</span> <span style="color:#666">3</span>   <span style="color:#666">--&gt;</span> r0 <span style="color:#666">=</span> r0 <span style="color:#666">*</span> sizeof(u64)
+</span></span><span style="display:flex;"><span>  <span style="color:#666">22</span>: (<span style="color:#666">0</span>f) r0 <span style="color:#666">+=</span> r1   <span style="color:#666">--&gt;</span> r0 now points to value area <span style="color:#666">+</span> key offset
+</span></span><span style="display:flex;"><span>  <span style="color:#666">23</span>: (<span style="color:#666">05</span>) goto pc<span style="color:#666">+</span><span style="color:#666">1</span>    <span style="color:#666">--&gt;</span> unconditional jump; skip instruction <span style="color:#666">24</span> when the key was valid
+</span></span><span style="display:flex;"><span>  <span style="color:#666">24</span>: (b7) r0 <span style="color:#666">=</span> <span style="color:#666">0</span>   <span style="color:#666">--&gt;</span> r0 <span style="color:#666">=</span> NULL (fallback <span style="color:#a2f;font-weight:bold">case</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; <span style="color:#a2f;font-weight:bold">if</span> (<span style="color:#666">!</span>valp)    <span style="color:#666">--&gt;</span> valp contains the result of the bpf_map_lookup_elem
+</span></span><span style="display:flex;"><span>  <span style="color:#666">25</span>: (<span style="color:#666">55</span>) <span style="color:#a2f;font-weight:bold">if</span> r0 <span style="color:#666">!=</span> <span style="color:#666">0x0</span> goto pc<span style="color:#666">+</span><span style="color:#666">10</span>    <span style="color:#666">--&gt;</span> r0 has the points to the value returned by the bpf_map_lookup_elem;
+</span></span><span style="display:flex;"><span>                                      <span style="color:#a2f;font-weight:bold">if</span> r0 <span style="color:#666">!=</span> <span style="color:#666">0x0</span> it means that the lookup succeeded <span style="color:#a2f;font-weight:bold">and</span> valp has a valid 
+</span></span><span style="display:flex;"><span>                                      value so we jump <span style="color:#666">10</span> instructions ahead
+</span></span><span style="display:flex;"><span>                                      <span style="color:#a2f;font-weight:bold">if</span> r0 <span style="color:#666">==</span> <span style="color:#666">0x0</span> it means the that key was <span style="color:#a2f;font-weight:bold">not</span> found <span style="color:#a2f;font-weight:bold">in</span> the map, 
+</span></span><span style="display:flex;"><span>                                      so the program continues <span style="color:#a2f;font-weight:bold">and</span> insert an initial value
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">26</span>: (bf) r2 <span style="color:#666">=</span> r10   <span style="color:#666">--&gt;</span> top of the stack
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; bpf_map_update_elem(<span style="color:#666">&amp;</span>counter, <span style="color:#666">&amp;</span>key, <span style="color:#666">&amp;</span>initval, BPF_ANY);
+</span></span><span style="display:flex;"><span>  <span style="color:#666">27</span>: (<span style="color:#666">07</span>) r2 <span style="color:#666">+=</span> <span style="color:#666">-</span><span style="color:#666">4</span>   <span style="color:#666">--&gt;</span> r2 now points to key (stored at r10 <span style="color:#666">-</span> <span style="color:#666">4</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#666">28</span>: (bf) r3 <span style="color:#666">=</span> r10   <span style="color:#666">--&gt;</span> top of the stack
+</span></span><span style="display:flex;"><span>  <span style="color:#666">29</span>: (<span style="color:#666">07</span>) r3 <span style="color:#666">+=</span> <span style="color:#666">-</span><span style="color:#666">16</span>    <span style="color:#666">--&gt;</span> r3 points to <span style="color:#666">&amp;</span>initval (<span style="color:#666">1</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#666">30</span>: (<span style="color:#666">18</span>) r1 <span style="color:#666">=</span> map[id:<span style="color:#666">98</span>]    <span style="color:#666">--&gt;</span> r1 <span style="color:#666">=</span> counter map pointer
+</span></span><span style="display:flex;"><span>  <span style="color:#666">32</span>: (b7) r4 <span style="color:#666">=</span> <span style="color:#666">0</span>   <span style="color:#666">--&gt;</span> r4 <span style="color:#666">=</span> BPF_ANY (insert <span style="color:#a2f;font-weight:bold">or</span> update)
+</span></span><span style="display:flex;"><span>  <span style="color:#666">33</span>: (<span style="color:#666">85</span>) call array_map_update_elem<span style="color:#080;font-style:italic">#320752 --&gt; update or insert new entry</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">34</span>: (b7) r0 <span style="color:#666">=</span> <span style="color:#666">0</span>   <span style="color:#666">--&gt;</span> <span style="color:#a2f;font-weight:bold">return</span> value is set to <span style="color:#666">0</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">35</span>: (<span style="color:#666">05</span>) goto pc<span style="color:#666">+</span><span style="color:#666">11</span>   <span style="color:#666">--&gt;</span> skip atomic add (we just inserted)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; __sync_fetch_and_add(valp, <span style="color:#666">1</span>);  <span style="color:#666">--&gt;</span> this function is used to <span style="color:#a2f;font-weight:bold">do</span> an atomic increment of 
+</span></span><span style="display:flex;"><span>                                      the value pointed by valp (taken from the map)
+</span></span><span style="display:flex;"><span>  <span style="color:#666">36</span>: (b7) r1 <span style="color:#666">=</span> <span style="color:#666">1</span>   <span style="color:#666">--&gt;</span> simple r1 is set to <span style="color:#666">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">37</span>: (db) lock <span style="color:#666">*</span>(u64 <span style="color:#666">*</span>)(r0 <span style="color:#666">+</span><span style="color:#666">0</span>) <span style="color:#666">+=</span> r1   <span style="color:#666">--&gt;</span> atomic increment 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; __sync_lock_test_and_set_8(<span style="color:#666">&amp;</span>global_counter,<span style="color:#666">1</span>);  <span style="color:#666">--&gt;</span> this is a lock<span style="color:#666">-</span>test<span style="color:#666">-</span><span style="color:#a2f;font-weight:bold">and</span><span style="color:#666">-</span>set using an atomic64_xchg, 
+</span></span><span style="display:flex;"><span>                                                      which swaps the contents of <span style="color:#666">*</span>global_counter with <span style="color:#666">1</span> atomically;
+</span></span><span style="display:flex;"><span>                                                      it sets the value to <span style="color:#666">1</span>, but also reads the old value
+</span></span><span style="display:flex;"><span>  <span style="color:#666">38</span>: (<span style="color:#666">18</span>) r1 <span style="color:#666">=</span> map[id:<span style="color:#666">99</span>][<span style="color:#666">0</span>]<span style="color:#666">+</span><span style="color:#666">0</span>   <span style="color:#666">--&gt;</span> <span style="color:#a2f">load</span> pointer to global_counter[<span style="color:#666">0</span>]
+</span></span><span style="display:flex;"><span>  <span style="color:#666">40</span>: (db) lock <span style="color:#666">*</span>(u64 <span style="color:#666">*</span>)(r1 <span style="color:#666">+</span><span style="color:#666">0</span>) <span style="color:#666">+=</span> r6   <span style="color:#666">--&gt;</span> atomic add: <span style="color:#666">*</span>global_counter <span style="color:#666">+=</span> <span style="color:#666">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>; bpf_printk(<span style="color:#b44">&#34;global_counter value </span><span style="color:#b68;font-weight:bold">%u</span><span style="color:#b62;font-weight:bold">\n</span><span style="color:#b44">&#34;</span>, global_counter);
+</span></span><span style="display:flex;"><span>  <span style="color:#666">41</span>: (<span style="color:#666">79</span>) r3 <span style="color:#666">=</span> <span style="color:#666">*</span>(u64 <span style="color:#666">*</span>)(r1 <span style="color:#666">+</span><span style="color:#666">0</span>)   <span style="color:#666">--&gt;</span> <span style="color:#a2f">load</span> global_counter value
+</span></span><span style="display:flex;"><span>  <span style="color:#666">42</span>: (<span style="color:#666">18</span>) r1 <span style="color:#666">=</span> map[id:<span style="color:#666">100</span>][<span style="color:#666">0</span>]<span style="color:#666">+</span><span style="color:#666">0</span>    <span style="color:#666">--&gt;</span> <span style="color:#a2f">load</span> pointer to fmt string
+</span></span><span style="display:flex;"><span>  <span style="color:#666">44</span>: (b7) r2 <span style="color:#666">=</span> <span style="color:#666">25</span>    <span style="color:#666">--&gt;</span> size of format string
+</span></span><span style="display:flex;"><span>  <span style="color:#666">45</span>: (<span style="color:#666">85</span>) call bpf_trace_printk<span style="color:#080;font-style:italic">#-112608    --&gt; print trace</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">46</span>: (b7) r0 <span style="color:#666">=</span> <span style="color:#666">2</span>   <span style="color:#666">--&gt;</span> set default <span style="color:#a2f;font-weight:bold">return</span> value (XDP_PASS) as defined <span style="color:#a2f;font-weight:bold">in</span> common<span style="color:#666">.</span>h
+</span></span><span style="display:flex;"><span>; }
+</span></span><span style="display:flex;"><span>  <span style="color:#666">47</span>: (<span style="color:#666">95</span>) exit   <span style="color:#666">--&gt;</span> exit program
+</span></span></code></pre></div><p>Let’s also take a look at the maps:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>sudo bpftool map show
+</span></span><span style="display:flex;"><span><span style="color:#666">...</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">62</span>: array  name counter  flags <span style="color:#666">0x0</span>
+</span></span><span style="display:flex;"><span>	key <span style="color:#666">4</span>B  value <span style="color:#666">8</span>B  max_entries <span style="color:#666">1</span>  memlock <span style="color:#666">392</span>B
+</span></span><span style="display:flex;"><span>	btf_id <span style="color:#666">295</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">63</span>: array  name <span style="color:#666">.</span>bss  flags <span style="color:#666">0x0</span>
+</span></span><span style="display:flex;"><span>	key <span style="color:#666">4</span>B  value <span style="color:#666">8</span>B  max_entries <span style="color:#666">1</span>  memlock <span style="color:#666">392</span>B
+</span></span><span style="display:flex;"><span>	btf_id <span style="color:#666">296</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">64</span>: array  name <span style="color:#666">.</span>rodata  flags <span style="color:#666">0x80</span>
+</span></span><span style="display:flex;"><span>	key <span style="color:#666">4</span>B  value <span style="color:#666">25</span>B  max_entries <span style="color:#666">1</span>  memlock <span style="color:#666">416</span>B
+</span></span><span style="display:flex;"><span>	btf_id <span style="color:#666">297</span>  frozen
+</span></span></code></pre></div><p>There are more maps than expected. In the code we have only one eBPF map called <code>counter</code> but there&rsquo;s also a global variable.</p>
+<p>Let&rsquo;s understand what is happening.</p>
+<p>Well, as stated in the <a href="https://docs.ebpf.io/linux/map-type/BPF_MAP_TYPE_ARRAY/#global-data" target="_blank" rel="noopener">eBPF docs</a>:</p>
+<blockquote>
+<p>In eBPF we have no heap, only the stack and pointers into kernel space. To work around the issue, we use array maps. The compiler will place global data into the .data, .rodata, and .bss ELF sections. The loader will take these sections and turn them into array maps with a single key (max_entries set to 1) and its value the same size as the binary blob in the ELF section.</p>
+</blockquote>
+<p>Let&rsquo;s see one by one.</p>
+<p>The following map represents the <code>counter</code> of type <code>BPF_MAP_TYPE_ARRAY</code>, and as we can see, there is only one element with <code>key = 0</code> and <code>value = 40</code>. This means that the eBPF program has analyzed 40 IPv4 packets.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>sudo bpftool map dump id <span style="color:#666">62</span>
+</span></span><span style="display:flex;"><span>[{
+</span></span><span style="display:flex;"><span>        <span style="color:#b44">&#34;key&#34;</span>: <span style="color:#666">0</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#b44">&#34;value&#34;</span>: <span style="color:#666">40</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><p>The following map represents the <code>.bss</code> section of the BPF program&rsquo;s data and it contains uninitialized global variables at load time.
+As we can see the value o the <code>global_counter</code> is 40, indeed we increment it when we increment the map <code>counter</code> value.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>sudo bpftool map dump id <span style="color:#666">63</span>
+</span></span><span style="display:flex;"><span>[{
+</span></span><span style="display:flex;"><span>        <span style="color:#b44">&#34;value&#34;</span>: {
+</span></span><span style="display:flex;"><span>            <span style="color:#b44">&#34;.bss&#34;</span>: [{
+</span></span><span style="display:flex;"><span>                    <span style="color:#b44">&#34;global_counter&#34;</span>: <span style="color:#666">40</span>
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            ]
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><p>The following map represents the <code>.rodata</code> section, which holds read-only data, often including format strings used in &lsquo;bpf_printk&rsquo;.
+The format string shown as ASCII is: &ldquo;global_counter value %u\n\0&rdquo;</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>sudo bpftool map dump id <span style="color:#666">64</span>
+</span></span><span style="display:flex;"><span>[{
+</span></span><span style="display:flex;"><span>        <span style="color:#b44">&#34;value&#34;</span>: {
+</span></span><span style="display:flex;"><span>            <span style="color:#b44">&#34;.rodata&#34;</span>: [{
+</span></span><span style="display:flex;"><span>                    <span style="color:#b44">&#34;xdp_func.____fmt&#34;</span>: [<span style="color:#666">103</span>,<span style="color:#666">108</span>,<span style="color:#666">111</span>,<span style="color:#666">98</span>,<span style="color:#666">97</span>,<span style="color:#666">108</span>,<span style="color:#666">95</span>,<span style="color:#666">99</span>,<span style="color:#666">111</span>,<span style="color:#666">117</span>,<span style="color:#666">110</span>,<span style="color:#666">116</span>,<span style="color:#666">101</span>,<span style="color:#666">114</span>,<span style="color:#666">32</span>,<span style="color:#666">118</span>,<span style="color:#666">97</span>,<span style="color:#666">108</span>,<span style="color:#666">117</span>,<span style="color:#666">101</span>,<span style="color:#666">32</span>,<span style="color:#666">37</span>,<span style="color:#666">117</span>,<span style="color:#666">10</span>,<span style="color:#666">0</span>
+</span></span><span style="display:flex;"><span>                    ]
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            ]
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><p>As for the use of bpftool, that&rsquo;s all for now, but as mentioned earlier, bpftool can be used for many other purposes.</p>
+<h3 id="readelf"><code>readelf</code> <a href="#readelf" class="anchor">🔗</a></h3><p>First let&rsquo;s use <code>readelf -s bpf_bpfel.o</code> that shows symbols like function names and map references.</p>
+<p>Here’s some information about the columns before the output:</p>
+<ul>
+<li>Num: Symbol index in the symbol table.</li>
+<li>Value: Address or offset of the symbol.</li>
+<li>Size: Size of the symbol in bytes.</li>
+<li>Type: Type of the symbol
+<ul>
+<li>FUNC: Function symbol. Entry point of the eBPF program</li>
+<li>OBJECT: Data object live variable, constant, map, etc..</li>
+<li>NOTYPE: No specific type. Often are internal compiler labels. (I need to go deeper here)</li>
+<li>SECTION: It is used to mark the presence of a section like .rodata, .text, etc.. There is no actual data or code, indeed the Size is 0.</li>
+</ul>
+</li>
+<li>Bind: Binding type of the symbol:
+<ul>
+<li>LOCAL: Symbol is local to the object file.</li>
+<li>GLOBAL: Symbol is visible to other object files (can be used across modules).</li>
+</ul>
+</li>
+<li>Vis: Visibility (usually DEFAULT for symbols visible to all parts of the program).</li>
+<li>Ndx: Index of the section in which the symbol is located.</li>
+<li>Name: Name of the symbol.</li>
+</ul>
+<p>Note also that the <code>bpf_bpfel.o</code> file is generated using the command <code>make generate TARGET=program_insights/xdp</code>, which runs <code>go generate</code> on the <code>.c</code> file.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>readelf <span style="color:#666">-</span>s bpf_bpfel<span style="color:#666">.</span>o
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Symbol table <span style="color:#b44">&#39;.symtab&#39;</span> contains <span style="color:#666">10</span> entries:
+</span></span><span style="display:flex;"><span>   Num:    Value          Size Type    Bind   Vis      Ndx Name
+</span></span><span style="display:flex;"><span>     <span style="color:#666">0</span>: <span style="color:#666">0000000000000000</span>     <span style="color:#666">0</span> NOTYPE  LOCAL  DEFAULT  UND                    <span style="color:#666">--&gt;</span> it is something <span style="color:#a2f;font-weight:bold">not</span> defined <span style="color:#a2f;font-weight:bold">in</span> the object file but something external
+</span></span><span style="display:flex;"><span>     <span style="color:#666">1</span>: <span style="color:#666">0000000000000000</span>     <span style="color:#666">0</span> SECTION LOCAL  DEFAULT    <span style="color:#666">3</span> xdp                <span style="color:#666">--&gt;</span> xdp section; it says where xdp_func is defined (section <span style="color:#666">3</span>)
+</span></span><span style="display:flex;"><span>     <span style="color:#666">2</span>: <span style="color:#666">0000000000000148</span>     <span style="color:#666">0</span> NOTYPE  LOCAL  DEFAULT    <span style="color:#666">3</span> LBB0_6             <span style="color:#666">--&gt;</span> label used <span style="color:#a2f;font-weight:bold">in</span> the program 
+</span></span><span style="display:flex;"><span>     <span style="color:#666">3</span>: <span style="color:#666">00000000000000</span>f0     <span style="color:#666">0</span> NOTYPE  LOCAL  DEFAULT    <span style="color:#666">3</span> LBB0_5             <span style="color:#666">--&gt;</span> label used <span style="color:#a2f;font-weight:bold">in</span> the program 
+</span></span><span style="display:flex;"><span>     <span style="color:#666">4</span>: <span style="color:#666">0000000000000000</span>    <span style="color:#666">25</span> OBJECT  LOCAL  DEFAULT    <span style="color:#666">8</span> xdp_func<span style="color:#666">.</span>____fmt   <span style="color:#666">--&gt;</span> format string used <span style="color:#a2f;font-weight:bold">in</span> bpf_printk, stored <span style="color:#a2f;font-weight:bold">in</span> <span style="color:#666">.</span>rodata (section <span style="color:#666">8</span>)
+</span></span><span style="display:flex;"><span>     <span style="color:#666">5</span>: <span style="color:#666">0000000000000000</span>     <span style="color:#666">0</span> SECTION LOCAL  DEFAULT    <span style="color:#666">8</span> <span style="color:#666">.</span>rodata            <span style="color:#666">--&gt;</span> read only data section (section <span style="color:#666">8</span>)
+</span></span><span style="display:flex;"><span>     <span style="color:#666">6</span>: <span style="color:#666">0000000000000000</span>   <span style="color:#666">336</span> FUNC    GLOBAL DEFAULT    <span style="color:#666">3</span> xdp_func           <span style="color:#666">--&gt;</span> entry point <span style="color:#a2f;font-weight:bold">for</span> the eBPF program (section <span style="color:#666">3</span> xdp)
+</span></span><span style="display:flex;"><span>     <span style="color:#666">7</span>: <span style="color:#666">0000000000000000</span>    <span style="color:#666">32</span> OBJECT  GLOBAL DEFAULT    <span style="color:#666">7</span> counter            <span style="color:#666">--&gt;</span> map definition (section <span style="color:#666">7</span> <span style="color:#666">.</span>maps) Why is <span style="color:#666">32</span> bytes<span style="">?</span> Explained later<span style="color:#666">.</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#666">8</span>: <span style="color:#666">0000000000000000</span>     <span style="color:#666">8</span> OBJECT  GLOBAL DEFAULT    <span style="color:#666">6</span> global_counter     <span style="color:#666">--&gt;</span> global variable stored <span style="color:#a2f;font-weight:bold">in</span> <span style="color:#666">.</span>bss
+</span></span><span style="display:flex;"><span>     <span style="color:#666">9</span>: <span style="color:#666">0000000000000000</span>    <span style="color:#666">13</span> OBJECT  GLOBAL DEFAULT    <span style="color:#666">5</span> __license          <span style="color:#666">--&gt;</span> license stored <span style="color:#a2f;font-weight:bold">in</span> <span style="color:#666">.</span>data
+</span></span></code></pre></div><p>To fully understand the previous output and the comments on the right part we need to take a look to the sections (<code>-S</code> flag) output described later.</p>
+<p><strong>Note:</strong> <code>LBB0_6</code> and <code>LBB0_5</code> are internal markers used by the compiler for different parts of the eBPF program.</p>
+<p>Now, let&rsquo;s use <code>readelf -S bpf_bpfel.o</code>, which shows the sections headers, i.e., BPF maps and program sections:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>readelf -S bpf_bpfel.o
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>There are 15 section headers, starting at offset 0xc58:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Section Headers:
+</span></span><span style="display:flex;"><span>  [Nr] Name              Type             Address           Offset    Size              EntSize          Flags  Link  Info  Align
+</span></span><span style="display:flex;"><span>  [ 0]                   NULL             0000000000000000  00000000  0000000000000000  0000000000000000           0     0     0
+</span></span><span style="display:flex;"><span>  [ 1] .strtab           STRTAB           0000000000000000  00000bbd  0000000000000097  0000000000000000           0     0     1
+</span></span><span style="display:flex;"><span>  [ 2] .text             PROGBITS         0000000000000000  00000040  0000000000000000  0000000000000000  AX       0     0     4
+</span></span><span style="display:flex;"><span>  [ 3] xdp               PROGBITS         0000000000000000  00000040  0000000000000150  0000000000000000  AX       0     0     8
+</span></span><span style="display:flex;"><span>  [ 4] .relxdp           REL              0000000000000000  00000a18  0000000000000040  0000000000000010   I      14     3     8
+</span></span><span style="display:flex;"><span>  [ 5] license           PROGBITS         0000000000000000  00000190  000000000000000d  0000000000000000  WA       0     0     1
+</span></span><span style="display:flex;"><span>  [ 6] .bss              NOBITS           0000000000000000  000001a0  0000000000000008  0000000000000000  WA       0     0     8
+</span></span><span style="display:flex;"><span>  [ 7] .maps             PROGBITS         0000000000000000  000001a0  0000000000000020  0000000000000000  WA       0     0     8
+</span></span><span style="display:flex;"><span>  [ 8] .rodata           PROGBITS         0000000000000000  000001c0  0000000000000019  0000000000000000   A       0     0     1
+</span></span><span style="display:flex;"><span>  [ 9] .BTF              PROGBITS         0000000000000000  000001dc  00000000000005f9  0000000000000000           0     0     4
+</span></span><span style="display:flex;"><span>  [10] .rel.BTF          REL              0000000000000000  00000a58  0000000000000040  0000000000000010   I      14     9     8
+</span></span><span style="display:flex;"><span>  [11] .BTF.ext          PROGBITS         0000000000000000  000007d8  0000000000000150  0000000000000000           0     0     4
+</span></span><span style="display:flex;"><span>  [12] .rel.BTF.ext      REL              0000000000000000  00000a98  0000000000000120  0000000000000010   I      14    11     8
+</span></span><span style="display:flex;"><span>  [13] .llvm_addrsig     LOOS+0xfff4c03   0000000000000000  00000bb8  0000000000000005  0000000000000000   E       0     0     1
+</span></span><span style="display:flex;"><span>  [14] .symtab           SYMTAB           0000000000000000  00000928  00000000000000f0  0000000000000018           1     6     8
+</span></span><span style="display:flex;"><span>Key to Flags:
+</span></span><span style="display:flex;"><span>  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+</span></span><span style="display:flex;"><span>  L (link order), O (extra OS processing required), G (group), T (TLS),
+</span></span><span style="display:flex;"><span>  C (compressed), x (unknown), o (OS specific), E (exclude),
+</span></span><span style="display:flex;"><span>  D (mbind), p (processor specific)
+</span></span></code></pre></div><p>Colums:</p>
+<ul>
+<li>Name: Name of the section</li>
+<li>Type: Type of the section
+<ul>
+<li>PROGBITS: Holds actual program or data content (like bytecode or variables).</li>
+<li>REL: Relocation section that contains information to adjust addresses or references.</li>
+<li>STRTAB: String table that holds strings used in other sections.</li>
+<li>SYMTAB: Symbol table containing information about program symbols (functions, variables).</li>
+<li>NOBITS: Doesn&rsquo;t have physical data but describes memory regions that will be allocated during execution (e.g., uninitialized variables).</li>
+<li>LOOS: OS-specific section (in this case, used by LLVM for address signature information).</li>
+</ul>
+</li>
+<li>Address: It is the virtual address where the section would reside when the program will be loaded in the kernel. As we can see is 0 because the address is determined during linking.</li>
+<li>Offset: It is the offset where the section starts</li>
+<li>Size: Byte size of the section</li>
+<li>EntSize: Entry size of each item in the section</li>
+<li>Flags:
+<ul>
+<li>W (write): The section is writable.</li>
+<li>A (alloc): The section is allocated in memory when loaded.</li>
+<li>X (execute): The section is executable.</li>
+<li>S (strings): The section contains string data.</li>
+<li>I (info): Information for processing.</li>
+<li>M (merge): The section can be merged with others of the same type.</li>
+</ul>
+</li>
+<li>Link: Section index to which this section is linked, if applicable. For relocation sections (REL), the Link column points to the symbol table (.symtab) that the relocations refer to.</li>
+<li>Info: Additional info like index into other sections or a ref to a symbol table.</li>
+<li>Align: Alignment requirement for the section. For example, .text is aligned to 4-byte boundaries, and .maps is aligned to 8-byte boundaries.</li>
+</ul>
+<h4 id="interesting-things">Interesting things <a href="#interesting-things" class="anchor">🔗</a></h4><p><code>.text</code> is a section that contains program data like the code for the eBPF program.</p>
+<p><code>.relxdp</code> contains information to update addresses or offsets within the xdp section or other sections when linking the object file. It has <code>Link=14</code> (section 14, i.e., the <code>.symtab</code> symbol table) and it has <code>Info=3</code> that means this relocation section contains entries that apply to section number 3, which is the XDP section (i.e., the eBPF code).</p>
+<p><code>.bss</code> represents uninitialized data (like global variables that are not explicitly initialized). Its size is 8 bytes because we have a global variable <code>__s64 global_counter</code> that is 8 bytes.</p>
+<p><code>.maps</code> contains only metadata describing the maps that need to be created by the eBPF loader. It does not contain the actual contents of the maps at runtime (those live in kernel space after map creation).</p>
+<h4 id="small-tldr-about-maps-why-is-32-bytes">Small tl;dr about <code>.maps</code>: why is 32 bytes? <a href="#small-tldr-about-maps-why-is-32-bytes" class="anchor">🔗</a></h4><p>In the eBPF code, we defined:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>struct {
+</span></span><span style="display:flex;"><span>    __uint(type, BPF_MAP_TYPE_ARRAY);   --&gt; 1 byte
+</span></span><span style="display:flex;"><span>    __uint(max_entries, 1);             --&gt; 1 byte
+</span></span><span style="display:flex;"><span>    __type(key, __u32);                 --&gt; 4 bytes
+</span></span><span style="display:flex;"><span>    __type(value, __u64);               --&gt; 8 bytes
+</span></span><span style="display:flex;"><span>} counter SEC(&#34;.maps&#34;);
+</span></span></code></pre></div><p>So why is it 32 bytes? Let&rsquo;s take a look at <a href="https://docs.ebpf.io/linux/concepts/maps/#btf-style-maps" target="_blank" rel="noopener">BTF Style Maps</a>. In particular we can see:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>#define __uint(name, val) int (*name)[val]  // pointer to array of int[val]
+</span></span><span style="display:flex;"><span>#define __type(name, val) typeof(val) *name // pointer to a value of type &#39;val&#39;
+</span></span></code></pre></div><p>So our eBPF map becomes:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>struct {
+</span></span><span style="display:flex;"><span>    int (*type)[1];          // pointer to int[1]  --&gt; 8 bytes
+</span></span><span style="display:flex;"><span>    int (*max_entries)[1];   // pointer to int[1]  --&gt; 8 bytes
+</span></span><span style="display:flex;"><span>    __u32 *key;              // pointer to __u32   --&gt; 8 bytes
+</span></span><span style="display:flex;"><span>    __u64 *value;            // pointer to __u64   --&gt; 8 bytes
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>On a 64-bit system, each field is a pointer, which means: 8 bytes per field and 4 fields x 8 bytes = 32 bytes total.
+That fully explains why the <code>.maps</code> section shows <code>Size: 32</code>.</p>
+<p>Moreover, the <strong>BTF Style Maps</strong> solves a problem of the <strong>Legacy Maps</strong> which is that the key an value type information is lost.</p>
+<p>As double check, we can do the following test.</p>
+<p>Modify the eBPF code to use the Legacy Style map (which is currently commented out), and comment out the BTF Style map.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>// Legacy Maps. More info here https://docs.ebpf.io/linux/concepts/maps/#legacy-maps
+</span></span><span style="display:flex;"><span>struct bpf_map_def SEC(&#34;maps&#34;) counter = {
+</span></span><span style="display:flex;"><span>    .type = BPF_MAP_TYPE_ARRAY,
+</span></span><span style="display:flex;"><span>    .key_size = sizeof(__u32),
+</span></span><span style="display:flex;"><span>    .value_size = sizeof(__u64),
+</span></span><span style="display:flex;"><span>    .max_entries = 1
+</span></span><span style="display:flex;"><span>} ;
+</span></span></code></pre></div><p>Where <code>bpf_map_def</code> definition is this:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>struct bpf_map_def {
+</span></span><span style="display:flex;"><span>	unsigned int type;
+</span></span><span style="display:flex;"><span>	unsigned int key_size;
+</span></span><span style="display:flex;"><span>	unsigned int value_size;
+</span></span><span style="display:flex;"><span>	unsigned int max_entries;
+</span></span><span style="display:flex;"><span>	unsigned int map_flags;
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>Regenerate the code with <code>go generate .</code> and then use <code>readelf -s bpf_bpfel.o</code>, whose output shows:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Num:    Value          Size Type    Bind   Vis      Ndx Name
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>7: 0000000000000000    20   OBJECT  GLOBAL DEFAULT    7 counter
+</span></span></code></pre></div><p>or <code>readelf -S bpf_bpfel.o</code>, whose output shows:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[Nr] Name              Type             Address           Offset       Size              EntSize          Flags  Link  Info  Alig
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>[ 7] maps              PROGBITS         0000000000000000  000001a0     0000000000000014  0000000000000000  WA       0     0     4
+</span></span></code></pre></div><p>The size is <code>0x14</code> in hexadecimal, which is 20 bytes. The function that does this job is <a href="https://elixir.bootlin.com/linux/v6.8/source/tools/lib/bpf/libbpf.c#L1672" target="_blank" rel="noopener">bpf_object__init_internal_map</a>.</p>
+<p>As for the use of readlef, that&rsquo;s all for now even if it can be used to do many other things.</p>
+<h3 id="llvm-objdump">llvm-objdump <a href="#llvm-objdump" class="anchor">🔗</a></h3><p>For completeness, below we can see the output of the command <code>llvm-objdump -S bpf_bpfel.o</code>, unlike the output from the command <code>bpftool prog dump xlated</code>, this output works on the <code>.o</code> file itself and not on the program loaded in the kernel.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>llvm-objdump -S bpf_bpfel.o
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>bpf_bpfel.o:	file format elf64-bpf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Disassembly of section xdp:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>0000000000000000 &lt;xdp_func&gt;:
+</span></span><span style="display:flex;"><span>; int xdp_func(struct xdp_md *ctx) {
+</span></span><span style="display:flex;"><span>       0:	b7 00 00 00 02 00 00 00	r0 = 0x2
+</span></span><span style="display:flex;"><span>;     void *data_end = (void*)(long)ctx-&gt;data_end; 
+</span></span><span style="display:flex;"><span>       1:	61 12 04 00 00 00 00 00	r2 = *(u32 *)(r1 + 0x4)
+</span></span><span style="display:flex;"><span>;     void *data = (void*)(long)ctx-&gt;data;
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>Notes:</p>
+<ul>
+<li><strong>-S</strong> shows the disassembled code alongside each line of source code.</li>
+<li><strong>-d</strong> disassemble all executable sections found in the input files.</li>
+<li><strong>-D</strong> disassembles all sections found in the input files.</li>
+</ul>
+<h2 id="summary">Summary <a href="#summary" class="anchor">🔗</a></h2><p>We learned how to use bpftool, readelf, and llvm-objdump to inspect an eBPF ELF file and gain a better understanding of its structure. Although this article is not exhaustive regarding these tools, it helped us grasp how to leverage them to uncover hidden details like maps (personally, my favorite part), variables, and instruction flow.</p>
+<p>It’s my first time writing a blog post like this, so I hope it was both enjoyable and understandable.</p>
+<p><strong>Special thanks to <a href="https://github.com/ekoops" target="_blank" rel="noopener">Leonardo Di Giovanna</a> and <a href="https://github.com/fmonaco96" target="_blank" rel="noopener">Francesco Monaco</a> for taking the time to review my article.</strong></p>
+<h2 id="references">References <a href="#references" class="anchor">🔗</a></h2><ul>
+<li><a href="https://wiki.osdev.org/ELF" target="_blank" rel="noopener">ELF</a></li>
+<li><a href="https://github.com/cilium/ebpf" target="_blank" rel="noopener">cilium/ebpf</a></li>
+<li><a href="https://github.com/libbpf/bpftool" target="_blank" rel="noopener">bpftool</a></li>
+<li><a href="https://manpages.ubuntu.com/manpages/focal/man8/bpftool-prog.8.html" target="_blank" rel="noopener">bpftool prog command</a></li>
+<li><a href="https://qmonnet.github.io/whirl-offload/2021/09/23/bpftool-features-thread/" target="_blank" rel="noopener">Features of bfptool (Quentin Monnet)</a>.</li>
+<li><a href="https://docs.cilium.io/en/latest/reference-guides/bpf/architecture/#instruction-set" target="_blank" rel="noopener">BPF and XDP Reference Guide from Cilium</a></li>
+<li><a href="https://www.man7.org/linux/man-pages/man1/readelf.1.html" target="_blank" rel="noopener">readelf</a></li>
+<li><a href="https://llvm.org/docs/CommandGuide/llvm-objdump.html" target="_blank" rel="noopener">llvm-objdump</a></li>
+<li><a href="https://docs.ebpf.io/" target="_blank" rel="noopener">ebpf docs</a></li>
+</ul>
+
+    </div>
+    
+
+    
+        <div class="tags">
+            
+                <a href="https://pinoogni.github.io/tags/ebpf">eBPF</a>
+            
+                <a href="https://pinoogni.github.io/tags/c">C</a>
+            
+        </div>
+    
+    
+    
+
+</section>
+
+
+    </main>
+    
+    <footer id="footer">
+    
+        <div id="social">
+
+
+    <a class="symbol" href="mailto:ognibenegiuseppe8@gmail.com" rel="me" target="_blank">
+        
+        <svg fill="#bbbbbb" width="28" height="28" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+    <title>Email</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Social-Icons---Rounded-Black" transform="translate(-264.000000, -939.000000)">
+            <g id="Email" transform="translate(264.000000, 939.000000)">
+                <path d="M8,72 L64,72 C68.418278,72 72,68.418278 72,64 L72,8 C72,3.581722 68.418278,-8.11624501e-16 64,0 L8,0 C3.581722,8.11624501e-16 -5.41083001e-16,3.581722 0,8 L0,64 C5.41083001e-16,68.418278 3.581722,72 8,72 Z" id="Rounded" fill="#bbbbbb"></path>
+                <g id="Envelope" fill="#FFFFFF">
+                    <path d="M60,20 L12,20 C10.8954305,20 10,20.8954305 10,22 L10,50 C10,51.1045695 10.8954305,52 12,52 L60,52 C61.1045695,52 62,51.1045695 62,50 L62,22 C62,20.8954305 61.1045695,20 60,20 Z" id="Envelope-Body"></path>
+                    <path d="M60,18 C58.8954305,18 58,18.8954305 58,20 L14,20 C13.1045695,20 12,19.1045695 12,18 L12,4 C12,2.8954305 13.1045695,2 14,2 L58,2 C59.1045695,2 60,2.8954305 60,4 L60,18 Z" id="Envelope-Flap"></path>
+                    <path d="M0,20 L36,36 L72,20 L36,32 L0,20 Z" id="Envelope-Open"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+
+    </a>
+
+    <a class="symbol" href="https://github.com/pinoOgni" rel="me" target="_blank">
+        
+        <svg fill="#bbbbbb" width="28" height="28"  viewBox="0 0 72 72" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    
+    <title>Github</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Social-Icons---Rounded-Black" transform="translate(-264.000000, -939.000000)">
+            <g id="Github" transform="translate(264.000000, 939.000000)">
+                <path d="M8,72 L64,72 C68.418278,72 72,68.418278 72,64 L72,8 C72,3.581722 68.418278,-8.11624501e-16 64,0 L8,0 C3.581722,8.11624501e-16 -5.41083001e-16,3.581722 0,8 L0,64 C5.41083001e-16,68.418278 3.581722,72 8,72 Z" id="Rounded" fill="#bbbbbb"></path>
+                <path d="M35.9985,13 C22.746,13 12,23.7870921 12,37.096644 C12,47.7406712 18.876,56.7718301 28.4145,59.9584121 C29.6145,60.1797862 30.0525,59.4358488 30.0525,58.7973276 C30.0525,58.2250681 30.0315,56.7100863 30.0195,54.6996482 C23.343,56.1558981 21.9345,51.4693938 21.9345,51.4693938 C20.844,48.6864054 19.2705,47.9454799 19.2705,47.9454799 C17.091,46.4500754 19.4355,46.4801943 19.4355,46.4801943 C21.843,46.6503662 23.1105,48.9634994 23.1105,48.9634994 C25.2525,52.6455377 28.728,51.5823398 30.096,50.9649018 C30.3135,49.4077535 30.9345,48.3460615 31.62,47.7436831 C26.2905,47.1352808 20.688,45.0691228 20.688,35.8361671 C20.688,33.2052792 21.6225,31.0547881 23.1585,29.3696344 C22.911,28.7597262 22.0875,26.3110578 23.3925,22.9934585 C23.3925,22.9934585 25.4085,22.3459017 29.9925,25.4632101 C31.908,24.9285993 33.96,24.6620468 36.0015,24.6515052 C38.04,24.6620468 40.0935,24.9285993 42.0105,25.4632101 C46.5915,22.3459017 48.603,22.9934585 48.603,22.9934585 C49.9125,26.3110578 49.089,28.7597262 48.8415,29.3696344 C50.3805,31.0547881 51.309,33.2052792 51.309,35.8361671 C51.309,45.0917119 45.6975,47.1292571 40.3515,47.7256117 C41.2125,48.4695491 41.9805,49.9393525 41.9805,52.1877301 C41.9805,55.4089489 41.9505,58.0067059 41.9505,58.7973276 C41.9505,59.4418726 42.3825,60.1918338 43.6005,59.9554002 C53.13,56.7627944 60,47.7376593 60,37.096644 C60,23.7870921 49.254,13 35.9985,13" fill="#FFFFFF"></path>
+            </g>
+        </g>
+    </g>
+</svg>
+    </a>
+
+    <a class="symbol" href="https://www.linkedin.com/in/giuseppe-ognibene-538930148/" rel="me" target="_blank">
+        
+        <svg width="28" height="28" fill="#bbbbbb" viewBox="0 0 500 500">
+  <g fill="none" fill-rule="evenodd">
+    <rect width="500" height="500" fill="#bbbbbb" rx="50"/>
+    <path fill="#FFF" d="M154.703 100.183c-19.121 0-34.689 15.565-34.703 34.701 0 19.136 15.568 34.704 34.703 34.704 19.128 0 34.688-15.568 34.688-34.704 0-19.134-15.561-34.701-34.688-34.701zm26.045 83.348h-52.094a4.488 4.488 0 0 0-4.488 4.489v167.675a4.488 4.488 0 0 0 4.488 4.488h52.093a4.49 4.49 0 0 0 4.489-4.488V188.02a4.486 4.486 0 0 0-4.488-4.489zm133.176-1.974c-19.064 0-35.817 5.805-46.04 15.271v-8.808c0-2.48-2.01-4.489-4.489-4.489h-49.971a4.489 4.489 0 0 0-4.489 4.489v167.675a4.488 4.488 0 0 0 4.489 4.488h52.044a4.49 4.49 0 0 0 4.489-4.488v-82.957c0-23.802 4.378-38.555 26.227-38.555 21.526.026 23.137 15.846 23.137 39.977v81.535a4.489 4.489 0 0 0 4.49 4.488h52.068a4.489 4.489 0 0 0 4.488-4.488v-91.977c-.001-38.253-7.553-82.161-66.443-82.161z"/>
+  </g>
+</svg>
+
+    </a>
+
+
+</div>
+
+    
+
+    <div class="copyright">
+    
+       © Copyright 
+       2025 
+       <span class="split">
+        <svg fill="#bbbbbb" width="15" height="15" version="1.1" id="heart-15" xmlns="http://www.w3.org/2000/svg" width="15px" height="15px" viewBox="0 0 15 15">
+  <path d="M13.91,6.75c-1.17,2.25-4.3,5.31-6.07,6.94c-0.1903,0.1718-0.4797,0.1718-0.67,0C5.39,12.06,2.26,9,1.09,6.75&#xA;&#x9;C-1.48,1.8,5-1.5,7.5,3.45C10-1.5,16.48,1.8,13.91,6.75z"/>
+</svg>
+       </span>
+       Giuseppe Ognibene
+    
+    </div>
+
+    
+      <div class="powerby">
+        Powered by <a href='http://www.gohugo.io/'>Hugo</a> Theme By <a href='https://github.com/nodejh/hugo-theme-mini'>nodejh</a>
+      </div>
+    
+</footer>
+
+
+
+  </body>
+</html>
