@@ -6,8 +6,15 @@
     <description>Recent content on Giuseppe Ognibene</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 01 Jan 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 11 Jun 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://pinoogni.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>eBPF Program Insights</title>
+      <link>https://pinoogni.github.io/articles/ebpf-program-insights/</link>
+      <pubDate>Wed, 11 Jun 2025 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/articles/ebpf-program-insights/</guid>
+      <description>&lt;div style=&#34;display: flex; justify-content: space-between; margin-bottom: 20px;&#34;&gt;&#xA;  &lt;img src=&#34;https://pinoogni.github.io/images/articles/ebpf-program-insights-2.png&#34; width=&#34;300&#34; style=&#34;margin-right: 20px;&#34; /&gt;&#xA;  &lt;img src=&#34;https://pinoogni.github.io/images/articles/ebpf-program-insights-1.png&#34; width=&#34;300&#34; /&gt;&#xA;&lt;/div&gt;&#xA;&lt;h2 id=&#34;introduction&#34;&gt;Introduction &lt;a href=&#34;#introduction&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;In this article we will see different ways to inspect an eBPF program in order to understand more about eBPF.&lt;/p&gt;&#xA;&lt;p&gt;This article is intended for developers who already have basic familiarity with eBPF programs and want to explore how to inspect compiled &lt;code&gt;.o&lt;/code&gt; files using different tools. Some knowledge of Go, C, and tools for working with eBPF in Go (such as &lt;code&gt;bpf2go&lt;/code&gt;) will be helpful.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Netnscli</title>
       <link>https://pinoogni.github.io/projects/netnscli/</link>

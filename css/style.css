@@ -393,11 +393,13 @@ nav.navigation a.button {
 
 #single .content {
   margin-top: 36px;
+  max-width: 100%;
 }
 
 #single .tags {
   margin-top: 24px;
 }
+
 #single .tags a {
   background: #f2f2f2;
   padding: 4px 7px;
@@ -410,54 +412,54 @@ nav.navigation a.button {
 }
 
 
-#projects {
+#showcases {
   max-width: 600px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
-#projects .total {
+#showcases .total {
   font-size: 15px;
 }
 
-#projects .group {
+#showcases .group {
   margin: 24px auto; 
 }
-#projects .group .key {
+#showcases .group .key {
   font-size: 20px;
   margin-bottom: 12px;
 }
-#projects .group .value {
+#showcases .group .value {
   display: block;
   font-size: 16px;
   margin-bottom: 12px;
 }
-#projects .group .value .date {
+#showcases .group .value .date {
   display: inline-block;
   color: #999;
   min-width: 60px;
 }
-#projects .group .value .title {
+#showcases .group .value .title {
   display: inline;
 }
-#projects .group .value .title a {
+#showcases .group .value .title a {
   color:#404040;
 }
-#projects .group .value .title a:hover {
+#showcases .group .value .title a:hover {
   color: #0366d6;
 }
-#projects .group .value .tags {
+#showcases .group .value .tags {
   display: inline;
   margin-left: 7px;
 }
-#projects .group .value .tags a {
+#showcases .group .value .tags a {
   background: #f2f2f2;
   padding: 4px 7px;
   color: #999;
   font-size: 14px;
   margin-right: 3px;
 }
-#projects .group .value .tags a:hover {
+#showcases .group .value .tags a:hover {
   color: #0366d6;
 }
 
