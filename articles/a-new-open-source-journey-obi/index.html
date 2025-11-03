@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>A new open source journey: OBI | Giuseppe Ognibene</title>
+
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
+<meta name="viewport" content="width=device-width,minimum-scale=1">
+<meta name="description" content="A new open source journey: OBI">
+<meta name="generator" content="Hugo 0.136.2">
+
+
+  <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+
+ 
+  
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-DDFXK8TXMF"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-DDFXK8TXMF');
+        }
+      </script>
+
+
+
+
+
+
+
+  </head>
+
+  <body>
+    <nav class="navigation">
+	
+		<a href="/"> <span class="arrow">←</span>Home</a>
+	
+	<a href="/about">About</a>
+	<a href="/projects">Projects</a>
+	<a href="/articles">Articles</a>
+	<a href="/tags">Tags</a>
+
+	
+
+	
+</nav>
+
+
+    <main class="main">
+      
+
+<section id="single">
+    <h1 class="title">A new open source journey: OBI</h1>
+
+    <div class="tip">
+        <time datetime="2025-11-01 00:00:00 &#43;0000 UTC">2025</time>
+        <span class="split">
+          ·
+        </span>
+        <span>
+          2291 words
+        </span>
+        <span class="split">
+          ·
+        </span>
+        <span>
+          11 minute read
+        </span>
+    </div>
+
+    
+    
+        
+  
+    <aside class="toc">
+      <details>
+          <summary>Table of Contents
+          </summary>
+          <div>
+              <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#what-is-obi">What is OBI?</a></li>
+    <li><a href="#project-structure-overview">Project structure overview</a></li>
+    <li><a href="#lets-try-obi">Let&rsquo;s try OBI!</a>
+      <ul>
+        <li><a href="#prerequisities">Prerequisities</a></li>
+        <li><a href="#installation">Installation</a></li>
+        <li><a href="#configuration">Configuration</a></li>
+        <li><a href="#run-jaeger">Run Jaeger</a></li>
+        <li><a href="#build-obi-binary">Build OBI binary</a></li>
+        <li><a href="#run-it">Run it</a></li>
+        <li><a href="#applications-example">Applications example</a></li>
+        <li><a href="#check-traces">Check Traces.</a></li>
+        <li><a href="#check-metrics">Check Metrics</a></li>
+        <li><a href="#running-obi-with-docker-or-kubernetes">Running OBI with Docker or Kubernetes</a></li>
+      </ul>
+    </li>
+    <li><a href="#contributing-to-obi">Contributing to OBI</a></li>
+    <li><a href="#learn-more-about-obi">Learn more about OBI</a></li>
+  </ul>
+</nav>
+          </div>
+      </details>
+    </aside>
+  
+
+
+    
+
+
+    <div class="content">
+      <div style="display: flex; justify-content: center;  align-items: center">
+  <img src="/images/articles/obi-1.png" width="50%" />
+</div>
+<h2 id="introduction">Introduction <a href="#introduction" class="anchor">🔗</a></h2><p>It’s been about a month since I joined the <a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation" target="_blank" rel="noopener">OBI</a> project, and it already feels like one of those journeys where you learn something new every single day.</p>
+<p>In this post, I’ll give a short introduction to what OBI is, walk through its project structure, show how you can try it out yourself, and share how to get involved. This won’t be a deep technical dive, you can think of it as a friendly overview to get familiar with the project and see it in action for the first time.</p>
+<h2 id="what-is-obi">What is OBI? <a href="#what-is-obi" class="anchor">🔗</a></h2><p><strong>OBI</strong> or <strong>Opentelemetry eBPF Instrumentation</strong> is an open source <strong>WIP</strong> project that provides a lightweight and efficient way to collect telemetry data using eBPF for user-space applications.
+Originally, the project was started in <strong>Grafana Labs</strong> under the name <strong>Beyla</strong>, before being donatated to the <strong>CNCF OpenTelemetry Project</strong>, which led to the birth of OBI! 🥳</p>
+<p>In brief, from the official <a href="https://opentelemetry.io/docs/zero-code/obi/" target="_blank" rel="noopener">OpenTelemetry doc</a>:</p>
+<ul>
+<li>OBI uses eBPF (extended Berkeley Packet Filter) probes at the OS/kernel level to automatically observe application behaviour (executables, networking stack) without modifying application code or requiring language-specific agents.</li>
+<li>It hooks into user-space events (e.g., HTTP/S, gRPC calls) via uprobes, captures key telemetry such as spans (trace) and metrics (Rate-Errors-Duration) and then exports them in the OpenTelemetry Collector/OTLP format to any compatible backend.</li>
+<li>Because it lives at the kernel/user-space boundary it is language-agnostic: it can support Go, Java, .NET, Python, Ruby, Node.js, C, C++, Rust, etc. without instrumentation per-language.</li>
+<li>Deployment is typically agent or DaemonSet style (especially for Kubernetes) so you drop OBI onto your nodes and it begins capturing telemetry for your services automatically.</li>
+<li>The result: observability with minimal effort (zero or near-zero code changes), capturing distributed traces and low-cardinality metrics across services.</li>
+</ul>
+<p>Basically, it&rsquo;s a very cool agent 🕵️ that lets you know more about what&rsquo;s happening in your node and your applications. If you can observe it, you can troubleshoot issues faster, optimize performance, and ensure smooth operations.</p>
+<blockquote>
+<p><strong>🎉 Release Announcement: v0.1.0 🎉</strong>: just a few days ago, we released the first official version of OBI. It’s an exciting milestone for the team, and we’re really motivated to keep improving and expanding the project. You can check it here: 👉 <a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/releases/tag/v0.1.0" target="_blank" rel="noopener">OBI v0.1.0</a> 👈 .</p>
+</blockquote>
+<h2 id="project-structure-overview">Project structure overview <a href="#project-structure-overview" class="anchor">🔗</a></h2><p>When I approach a new project, I immediately focus on understanding its structure, where things are located and what they do, so I can get a clear picture of how everything fits together.</p>
+<p>Here is a high-level view of the repository structure and key components of OBI (from the <a href="github.com/open-telemetry/opentelemetry-ebpf-instrumentation">GitHub repo</a>).</p>
+<ul>
+<li><strong>bpf</strong>: Contains the C/eBPF programs (probes) that are compiled and attached into the kernel/user space. These define the events to observe, such as function entry/exit, network calls, etc. For example: <code>obi_packet_extender</code> function is an eBPF <code>sk_msg</code> probe which detects packets and it extends the HTTP header and writes the <code>Traceparent</code> string; or <code>obi_kprobe_tcp_connect</code> function which is an eBPF <code>kprobe/tcp_connect</code> probe to monitor TCP connection events and obtain socket details.
+<ul>
+<li><strong>bpf/gotracer</strong>: this part is completely related to instrument GO applications.</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><strong>examples/vendoring</strong>: OBI is  designed to be vendored inside other components.</li>
+<li><strong>devdocs</strong>: Documentation useful for developers</li>
+<li><strong>pkg</strong>: Go packages forming the core library. For example:
+<ul>
+<li><strong>pkg/ebpf</strong>: Here&rsquo;s all the code related to managing eBPF programs. For example, in <strong>pkg/ebpf/tracer_linux.go</strong> there&rsquo;s the function <a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/63defbf3d6850aad5130b0c2fbef24fc8b132f97/pkg/ebpf/tracer_linux.go#L201" target="_blank" rel="noopener">loadTracer(..)</a> which, as the name suggests, handles loading (and subsequently attaching) the various eBPF probes.</li>
+<li><strong>pkg/export</strong>: Takes care of exporting all telemetry data created by OBI, for example to OTEL collector (metrics and traces) or Promethues (metrics).</li>
+<li><strong>pkg/config</strong>: Everything about configuring OBI.</li>
+</ul>
+</li>
+<li><strong>cmd</strong>: Here we find the entry points for OBI (ebpf-instrument) and the Kubernetes informer metadata service (k8s-cache). Additionally, there&rsquo;s the <code>obi_genfiles.go</code> file, which handles the automatic generation of Go files, using the <code>bpf2go</code> tool to convert BPF code to Go code.</li>
+<li><strong>internal/test</strong>: Unit and integration tests to verify behaviour across environments (including Kubernetes).</li>
+</ul>
+<h2 id="lets-try-obi">Let&rsquo;s try OBI! <a href="#lets-try-obi" class="anchor">🔗</a></h2><p>Now that we know what OBI is and how it works, we can explore how to start using it in real-life scenarios, with some simple, hands-on examples.</p>
+<h3 id="prerequisities">Prerequisities <a href="#prerequisities" class="anchor">🔗</a></h3><p>Before staring, make sure you have:</p>
+<ul>
+<li>Linux Kernel &gt;= 5.8 with eBPF and BTF enabled</li>
+<li>GO &gt;= 1.17</li>
+<li>clang</li>
+<li>docker</li>
+<li>makef</li>
+<li>clang-format</li>
+<li>clang-tidy</li>
+</ul>
+<p>More info <a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">here</a>.</p>
+<h3 id="installation">Installation <a href="#installation" class="anchor">🔗</a></h3><p>Now, we can clone the repository by running the following command:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation.git
+</span></span><span style="display:flex;"><span><span style="color:#a2f">cd</span> opentelemetry-ebpf-instrumentation
+</span></span></code></pre></div><p>For this tutorial the only needed tool is <code>bpf2go</code> but, if you want to install all needed tools you just need to run <code>make tools</code> command that will download every needed tool inside <code>.tools</code> folder. <code>bpf2go</code> is needed to generate all the needed files, it will look in all files for a string like <code>go:generate $BPF2GO...</code>. This command needs to be executed every time there is a change in the eBPF code.</p>
+<h3 id="configuration">Configuration <a href="#configuration" class="anchor">🔗</a></h3><p>OBI requires a configuration file (or the corresponding ENV variables) to define what to monitor, how to export telemetry data and many other things. An example of full, default configuration is <a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/31f7983454fce614c9533713593981886b7ab4e1/pkg/obi/config.go#L69" target="_blank" rel="noopener">this</a>. The default configuration is overrided first by the provided file (if any) and then by the ENV variables, in order of increasing priority.</p>
+<p>Below is an example configuration file that will be used throughout the tutorial:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#008000;font-weight:bold">log_config</span>:<span style="color:#bbb"> </span>yaml<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#008000;font-weight:bold">discovery</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#008000;font-weight:bold">instrument</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">      </span>- <span style="color:#008000;font-weight:bold">exe_path</span>:<span style="color:#bbb"> </span><span style="color:#b44">&#34;*/http*&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#008000;font-weight:bold">prometheus_export</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#008000;font-weight:bold">features</span>:<span style="color:#bbb">  
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- application<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">    </span>- network<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#008000;font-weight:bold">port</span>:<span style="color:#bbb"> </span><span style="color:#666">9876</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#008000;font-weight:bold">otel_traces_export</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#008000;font-weight:bold">endpoint</span>:<span style="color:#bbb"> </span><span style="color:#b44">&#34;http://localhost:4318&#34;</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#008000;font-weight:bold">ebpf</span>:<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#008000;font-weight:bold">track_request_headers</span>:<span style="color:#bbb"> </span><span style="color:#a2f;font-weight:bold">true</span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">  </span><span style="color:#008000;font-weight:bold">context_propagation</span>:<span style="color:#bbb"> </span>all<span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb">
+</span></span></span><span style="display:flex;"><span><span style="color:#bbb"></span><span style="color:#008000;font-weight:bold">trace_printer</span>:<span style="color:#bbb"> </span><span style="color:#b44">&#34;json_indent&#34;</span><span style="color:#bbb">
+</span></span></span></code></pre></div><p>Explanation:</p>
+<p><code>log_config</code> or <code>OTEL_EBPF_LOG_CONFIG</code> enables the logging of the configuration on startup.</p>
+<p><code>discovery.instrument.exe_path</code> or <code>OTEL_EBPF_AUTO_TARGET_EXE</code> or <code>OTEL_GO_AUTO_TARGET_EXE</code> allows defining the regular expression matching the full executable path. In the configuration file, <code>exe_path: &quot;*/http*&quot;</code> means that we are interested in a executable with <code>&quot;http&quot;</code> in its name. OBI will look in the filesystem for a running binary with this name. There is another way to tell OBI what we are interested on and it&rsquo;s the <code>OTEL_EBPF_OPEN_PORT</code> which will select the instrumented exectuable that owns the provided port value.</p>
+<p><code>prometheus_export.features</code> or <code>OTEL_EBPF_PROMETHEUS_FEATURES</code> defines features of metrics that can be exported. Another way is to use <code>otel_metrics_export.features</code> or <code>OTEL_EBPF_METRIC_FEATURES</code>.</p>
+<p><code>prometheus_export.port</code> or <code>OTEL_EBPF_PROMETHEUS_PORT</code> defines the port where OBI displays metrics.</p>
+<p><code>otel_traces_export</code> defines the configuration to export traces. We use the default configuration and we just override <code>endpoint</code> with the endpoint of the docker container of Jaeger (see later)</p>
+<p><code>ebpf.track_request_headers</code> or <code>OTEL_EBPF_BPF_TRACK_REQUEST_HEADERS</code> the kprobes based HTTP request tracking will start tracking the request headers to process any <code>'Traceparent'</code> fields.</p>
+<p><code>ebpf.context_propagation</code> or <code>OTEL_EBPF_BPF_CONTEXT_PROPAGATION</code> enables distributed context propagation.</p>
+<p><code>trace_printer</code> or <code>OTEL_EBPF_TRACE_PRINTER</code> enables printing of traces to stdout. <strong>NOTE</strong>: the printed traces represent OBI&rsquo;s internal data format.</p>
+<p>With the previous configuration we can see both metrics and traces. Unfortunately OBI does not support log correlation <strong>yet</strong>.</p>
+<h3 id="run-jaeger">Run Jaeger <a href="#run-jaeger" class="anchor">🔗</a></h3><p>To see the exported traces we can use <strong>Jaeger</strong>. The simplest way to do that is:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker run -d <span style="color:#b62;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#b62;font-weight:bold"></span>  --name jaeger <span style="color:#b62;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#b62;font-weight:bold"></span>  -p 16686:16686 <span style="color:#b62;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#b62;font-weight:bold"></span>  -p 4317:4317 <span style="color:#b62;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#b62;font-weight:bold"></span>  -p 4318:4318 <span style="color:#b62;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#b62;font-weight:bold"></span>  -e <span style="color:#b8860b">COLLECTOR_OTLP_ENABLED</span><span style="color:#666">=</span><span style="color:#a2f">true</span> <span style="color:#b62;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#b62;font-weight:bold"></span>  -e <span style="color:#b8860b">LOG_LEVEL</span><span style="color:#666">=</span>debug <span style="color:#b62;font-weight:bold">\
+</span></span></span><span style="display:flex;"><span><span style="color:#b62;font-weight:bold"></span>  jaegertracing/all-in-one:1.60@sha256:4fd2d70fa347d6a47e79fcb06b1c177e6079f92cba88b083153d56263082135e
+</span></span></code></pre></div><p>This will enable us to use the Jaeger GUI later. Similar to the <strong>internal/test/integration</strong>, for example <a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/main/internal/test/integration/docker-compose.yml" target="_blank" rel="noopener">docker-compose.yml</a>.</p>
+<h3 id="build-obi-binary">Build OBI binary <a href="#build-obi-binary" class="anchor">🔗</a></h3><p>Building the binary is really easy, just use the <a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/main/Makefile" target="_blank" rel="noopener">Makefile</a>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>make generate <span style="color:#666">&amp;&amp;</span> make compile
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#080;font-style:italic"># Or, if you are using an arm64 architecture</span>
+</span></span><span style="display:flex;"><span><span style="color:#b8860b">GOARCH</span><span style="color:#666">=</span><span style="color:#b44">&#34;arm64&#34;</span> make generate <span style="color:#666">&amp;&amp;</span> <span style="color:#b8860b">GOARCH</span><span style="color:#666">=</span><span style="color:#b44">&#34;arm64&#34;</span> make compile
+</span></span></code></pre></div><p>This produces a binary at <code>.bin/ebpf-instrument</code>.</p>
+<h3 id="run-it">Run it <a href="#run-it" class="anchor">🔗</a></h3><p>Now we just need to create a file with the sample configuration and run the binary:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat <span style="color:#b44">&lt;&lt; EOF &gt; obi_conf_example.yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">log_config: yaml
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">discovery:
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">  instrument:
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">      - exe_path: &#34;*/http*&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">prometheus_export:
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">  features:  
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">    - application
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">    - network
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">  port: 9876
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">otel_traces_export:
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">  endpoint: &#34;http://localhost:4318&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">ebpf:
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">  track_request_headers: true
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">  context_propagation: all
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">trace_printer: &#34;json_indent&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">EOF</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sudo ./bin/ebpf-instrument --config obi_conf_example.yaml
+</span></span></code></pre></div><p>Once running, we can see the printed YAML configuration.</p>
+<h3 id="applications-example">Applications example <a href="#applications-example" class="anchor">🔗</a></h3><p>Now that OBI is up and running, it&rsquo;s time to put it to the test. To do that, we&rsquo;ll need a couple of simple examples: an <code>httpClient</code> and an <code>httpServer</code>.</p>
+<p>In a new terminal:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat <span style="color:#b44">&lt;&lt; EOF &gt; httpserver.go
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">// httpServer
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">package main
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">import (
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	&#34;fmt&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	&#34;log&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	&#34;net/http&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">)
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">func main() {
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	http.HandleFunc(&#34;/&#34;, func(w http.ResponseWriter, r *http.Request) {
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">		fmt.Fprintf(w, &#34;Let&#39;s go OBI!&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">		log.Printf(&#34;Received request from %s\n&#34;, r.RemoteAddr)
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	})
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	fmt.Println(&#34;Server listening on port 8080...&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	log.Fatal(http.ListenAndServe(&#34;:8080&#34;, nil))
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">}
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">EOF</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>go build -o httpServer httpserver.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>./httpServer
+</span></span></code></pre></div><p>In the terminal where OBI is running we can see the printout of a trace of type <code>ProcessAlive</code> related to <code>httpServer</code>.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#666">[</span>
+</span></span><span style="display:flex;"><span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;type&#34;</span>: <span style="color:#b44">&#34;ProcessAlive&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peer&#34;</span>: <span style="color:#b44">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peerPort&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;host&#34;</span>: <span style="color:#b44">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;hostPort&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;traceID&#34;</span>: <span style="color:#b44">&#34;00000000000000000000000000000000&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;spanID&#34;</span>: <span style="color:#b44">&#34;0000000000000000&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;parentSpanID&#34;</span>: <span style="color:#b44">&#34;0000000000000000&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;traceFlags&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peerName&#34;</span>: <span style="color:#b44">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;hostName&#34;</span>: <span style="color:#b44">&#34;httpServer&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;kind&#34;</span>: <span style="color:#b44">&#34;SPAN_KIND_INTERNAL&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;start&#34;</span>: <span style="color:#b44">&#34;1762008143771387&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerStart&#34;</span>: <span style="color:#b44">&#34;1762008143771387&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;end&#34;</span>: <span style="color:#b44">&#34;1762008143771387&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;duration&#34;</span>: <span style="color:#b44">&#34;0s&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;durationUSec&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerDuration&#34;</span>: <span style="color:#b44">&#34;0s&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerDurationUSec&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;attributes&#34;</span>: <span style="color:#666">{}</span>
+</span></span><span style="display:flex;"><span> <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">]</span>
+</span></span></code></pre></div><p>This trace type is an internal signal (<a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/31f7983454fce614c9533713593981886b7ab4e1/pkg/appolly/app/request/span.go#L28" target="_blank" rel="noopener">defined signals</a>) and it is ignored by the metrics exporters. We can also see that <code>traceID</code>, <code>spanID</code> and <code>parentSpanID</code> are <code>0</code>; the <code>hostName</code> is <code>httpserver</code> like our exectuable and finally the <code>kind</code> is <code>SPAN_KIND_INTERNAL</code>.</p>
+<p>In a new terminal:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat <span style="color:#b44">&lt;&lt; EOF &gt; httpclient.go
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">//httpClient
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">package main
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">import (
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	&#34;fmt&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	&#34;io&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	&#34;log&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	&#34;net/http&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	&#34;time&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">)
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">func main() {
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">  // the following sleep is optional and it is used
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">  // to let you see the ProcessAlive span from the OBI logs
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">  time.Sleep(5*time.Second)
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	for {
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">		resp, err := http.Get(&#34;http://localhost:8080&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">		if err != nil {
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">			log.Printf(&#34;Error making request: %v\n&#34;, err)
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">		} else {
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">			body, err := io.ReadAll(resp.Body)
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">			if err != nil {
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">				log.Printf(&#34;Error reading response body: %v\n&#34;, err)
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">			} else {
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">				fmt.Printf(&#34;Received from server: %s\n&#34;, string(body))
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">			}
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">			resp.Body.Close()
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">		}
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">		time.Sleep(time.Second)
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">	}
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">}
+</span></span></span><span style="display:flex;"><span><span style="color:#b44">EOF</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>go build -o httpClient httpclient.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>./httpClient <span style="color:#080;font-style:italic"># it will run until Ctrl+C</span>
+</span></span></code></pre></div><p>In the terminal where OBI is running we can see the printout of a trace of type <code>ProcessAlive</code> related to <code>httpClient</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#666">[</span>
+</span></span><span style="display:flex;"><span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;type&#34;</span>: <span style="color:#b44">&#34;ProcessAlive&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peer&#34;</span>: <span style="color:#b44">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peerPort&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;host&#34;</span>: <span style="color:#b44">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;hostPort&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;traceID&#34;</span>: <span style="color:#b44">&#34;00000000000000000000000000000000&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;spanID&#34;</span>: <span style="color:#b44">&#34;0000000000000000&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;parentSpanID&#34;</span>: <span style="color:#b44">&#34;0000000000000000&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;traceFlags&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peerName&#34;</span>: <span style="color:#b44">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;hostName&#34;</span>: <span style="color:#b44">&#34;httpClient&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;kind&#34;</span>: <span style="color:#b44">&#34;SPAN_KIND_INTERNAL&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;start&#34;</span>: <span style="color:#b44">&#34;1762008143771387&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerStart&#34;</span>: <span style="color:#b44">&#34;1762008143771387&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;end&#34;</span>: <span style="color:#b44">&#34;1762008143771387&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;duration&#34;</span>: <span style="color:#b44">&#34;0s&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;durationUSec&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerDuration&#34;</span>: <span style="color:#b44">&#34;0s&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerDurationUSec&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;attributes&#34;</span>: <span style="color:#666">{}</span>
+</span></span><span style="display:flex;"><span> <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">]</span>
+</span></span></code></pre></div><h3 id="check-traces">Check Traces. <a href="#check-traces" class="anchor">🔗</a></h3><p><strong>Note</strong>: The <code>httpClient</code> will continue making requests until <strong>Ctrl+C</strong> is pressed.</p>
+<p>In the terminal where OBI is running we can also see the printout of various traces relating to the requests that the <code>httpClient</code> makes to the <code>httpServer</code>.</p>
+<p>For example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#666">[</span>
+</span></span><span style="display:flex;"><span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;type&#34;</span>: <span style="color:#b44">&#34;HTTP&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peer&#34;</span>: <span style="color:#b44">&#34;127.0.0.1&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peerPort&#34;</span>: <span style="color:#b44">&#34;38284&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;host&#34;</span>: <span style="color:#b44">&#34;127.0.0.1&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;hostPort&#34;</span>: <span style="color:#b44">&#34;8080&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;traceID&#34;</span>: <span style="color:#b44">&#34;5c100acf373262870b52e98bec264fee&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;spanID&#34;</span>: <span style="color:#b44">&#34;24c160d8be87d6fa&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;parentSpanID&#34;</span>: <span style="color:#b44">&#34;d4b3812666187672&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;traceFlags&#34;</span>: <span style="color:#b44">&#34;1&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peerName&#34;</span>: <span style="color:#b44">&#34;127.0.0.1&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;hostName&#34;</span>: <span style="color:#b44">&#34;httpServer&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;kind&#34;</span>: <span style="color:#b44">&#34;SPAN_KIND_SERVER&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;start&#34;</span>: <span style="color:#b44">&#34;1762021460567218&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerStart&#34;</span>: <span style="color:#b44">&#34;1762021460567302&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;end&#34;</span>: <span style="color:#b44">&#34;1762021460567511&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;duration&#34;</span>: <span style="color:#b44">&#34;293.54µs&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;durationUSec&#34;</span>: <span style="color:#b44">&#34;293&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerDuration&#34;</span>: <span style="color:#b44">&#34;209.713µs&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerDurationUSec&#34;</span>: <span style="color:#b44">&#34;209&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;attributes&#34;</span>: <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;clientAddr&#34;</span>: <span style="color:#b44">&#34;127.0.0.1&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;contentLen&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;method&#34;</span>: <span style="color:#b44">&#34;GET&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;responseLen&#34;</span>: <span style="color:#b44">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;route&#34;</span>: <span style="color:#b44">&#34;/&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;serverAddr&#34;</span>: <span style="color:#b44">&#34;httpServer&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;serverPort&#34;</span>: <span style="color:#b44">&#34;8080&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;status&#34;</span>: <span style="color:#b44">&#34;200&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;url&#34;</span>: <span style="color:#b44">&#34;/&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span> <span style="color:#666">}</span>,
+</span></span><span style="display:flex;"><span> <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;type&#34;</span>: <span style="color:#b44">&#34;HTTPClient&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peer&#34;</span>: <span style="color:#b44">&#34;127.0.0.1&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peerPort&#34;</span>: <span style="color:#b44">&#34;38284&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;host&#34;</span>: <span style="color:#b44">&#34;127.0.0.1&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;hostPort&#34;</span>: <span style="color:#b44">&#34;8080&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;traceID&#34;</span>: <span style="color:#b44">&#34;5c100acf373262870b52e98bec264fee&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;spanID&#34;</span>: <span style="color:#b44">&#34;d4b3812666187672&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;parentSpanID&#34;</span>: <span style="color:#b44">&#34;0000000000000000&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;traceFlags&#34;</span>: <span style="color:#b44">&#34;1&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;peerName&#34;</span>: <span style="color:#b44">&#34;httpClient&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;hostName&#34;</span>: <span style="color:#b44">&#34;localhost:8080&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;kind&#34;</span>: <span style="color:#b44">&#34;SPAN_KIND_CLIENT&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;start&#34;</span>: <span style="color:#b44">&#34;1762021460566415&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerStart&#34;</span>: <span style="color:#b44">&#34;1762021460566415&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;end&#34;</span>: <span style="color:#b44">&#34;1762021460567935&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;duration&#34;</span>: <span style="color:#b44">&#34;1.519601ms&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;durationUSec&#34;</span>: <span style="color:#b44">&#34;1519&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerDuration&#34;</span>: <span style="color:#b44">&#34;1.519601ms&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;handlerDurationUSec&#34;</span>: <span style="color:#b44">&#34;1519&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#b44">&#34;attributes&#34;</span>: <span style="color:#666">{</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;clientAddr&#34;</span>: <span style="color:#b44">&#34;httpClient&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;method&#34;</span>: <span style="color:#b44">&#34;GET&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;serverAddr&#34;</span>: <span style="color:#b44">&#34;localhost:8080&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;serverPort&#34;</span>: <span style="color:#b44">&#34;8080&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;status&#34;</span>: <span style="color:#b44">&#34;200&#34;</span>,
+</span></span><span style="display:flex;"><span>   <span style="color:#b44">&#34;url&#34;</span>: <span style="color:#b44">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span> <span style="color:#666">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#666">]</span>
+</span></span></code></pre></div><p>One span is of type <code>SPAN_KIND_CLIENT</code> and one of type <code>SPAN_KIND_SERVER</code>. The client span lacks a <code>parentSpanID</code> and its <code>spanID</code> is <code>d4b3812666187672</code> which serves as the <code>parentSpanID</code> for the server span, linking the two.</p>
+<p>Notice that both spans share the same <code>traceID</code> (<code>5c100acf373262870b52e98bec264fee</code>) , tying them to the same request. Every span also contains useful information that are the basic components used to build the final, exported trace.</p>
+<p>The printouts above show an <strong>intermediate</strong> version of the spans. To see the actual values exported by the OBI exporter to tools like <code>Jaeger</code> we just need to go to <a href="http://localhost:16686" target="_blank" rel="noopener">http://localhost:16686</a>.</p>
+<p>On the left side let&rsquo;s select <code>httpClient</code> in the <code>Service</code> section, then <code>Find Traces</code>, and next, let&rsquo;s choose one of the traces, such as <code>httpClient: GET 5c100ac</code>. We should then see something like:</p>
+<div style="display: flex; justify-content: center;  align-items: center">
+  <img src="/images/articles/httpClient-trace.png" width="1000" height="450" style="margin-right: 20px;">
+</div>
+<h3 id="check-metrics">Check Metrics <a href="#check-metrics" class="anchor">🔗</a></h3><p>The metrics are available at <a href="http://localhost:9876/metrics" target="_blank" rel="noopener">http://localhost:9876/metrics</a>. This endpoint exposes all the metrics generated by OBI.</p>
+<p>As configured in our YAML configuration file, we specified &ldquo;application&rdquo; and &ldquo;networks&rdquo; as the featured to export, and we can see metrics related to both of these.</p>
+<p>For example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># HELP http_client_request_body_size_bytes size, in bytes, of the HTTP request body as sent from the client side
+</span></span><span style="display:flex;"><span># TYPE http_client_request_body_size_bytes histogram
+</span></span><span style="display:flex;"><span>http_client_request_body_size_bytes_bucket{http_request_method=&#34;GET&#34;,http_response_status_code=&#34;200&#34;,http_route=&#34;&#34;,instance=&#34;pino-machine:94493&#34;,job=&#34;httpClient&#34;,server_address=&#34;localhost:8080&#34;,server_port=&#34;8080&#34;,service_name=&#34;httpClient&#34;,service_namespace=&#34;&#34;,le=&#34;0&#34;} 7
+</span></span><span style="display:flex;"><span>http_client_request_body_size_bytes_bucket{http_request_method=&#34;GET&#34;,http_response_status_code=&#34;200&#34;,http_route=&#34;&#34;,instance=&#34;pino-machine:94493&#34;,job=&#34;httpClient&#34;,server_address=&#34;localhost:8080&#34;,server_port=&#34;8080&#34;,service_name=&#34;httpClient&#34;,service_namespace=&#34;&#34;,le=&#34;32&#34;} 7
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># HELP http_server_request_body_size_bytes size, in bytes, of the HTTP request body as received at the server side
+</span></span><span style="display:flex;"><span># TYPE http_server_request_body_size_bytes histogram
+</span></span><span style="display:flex;"><span>http_server_request_body_size_bytes_bucket{http_request_method=&#34;GET&#34;,http_response_status_code=&#34;200&#34;,http_route=&#34;/&#34;,instance=&#34;pino-machine:94278&#34;,job=&#34;httpServer&#34;,server_address=&#34;httpServer&#34;,server_port=&#34;8080&#34;,service_name=&#34;httpServer&#34;,service_namespace=&#34;&#34;,le=&#34;0&#34;} 7
+</span></span><span style="display:flex;"><span>http_server_request_body_size_bytes_bucket{http_request_method=&#34;GET&#34;,http_response_status_code=&#34;200&#34;,http_route=&#34;/&#34;,instance=&#34;pino-machine:94278&#34;,job=&#34;httpServer&#34;,server_address=&#34;httpServer&#34;,server_port=&#34;8080&#34;,service_name=&#34;httpServer&#34;,service_namespace=&#34;&#34;,le=&#34;32&#34;} 7
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># HELP obi_network_flow_bytes_total bytes submitted from a source network endpoint to a destination network endpoint
+</span></span><span style="display:flex;"><span># TYPE obi_network_flow_bytes_total counter
+</span></span><span style="display:flex;"><span>obi_network_flow_bytes_total{direction=&#34;request&#34;} 319083
+</span></span><span style="display:flex;"><span>obi_network_flow_bytes_total{direction=&#34;response&#34;} 2.085885e+06
+</span></span></code></pre></div><h3 id="running-obi-with-docker-or-kubernetes">Running OBI with Docker or Kubernetes <a href="#running-obi-with-docker-or-kubernetes" class="anchor">🔗</a></h3><p>If you&rsquo;re looking to take your OBI experience a step further and run it in a containerized environment, you can easily set it up with Docker or Kubernetes. You just need to check the official <a href="https://opentelemetry.io/docs/zero-code/obi/setup/" target="_blank" rel="noopener">OpenTelemetry doc</a>.</p>
+<h2 id="contributing-to-obi">Contributing to OBI <a href="#contributing-to-obi" class="anchor">🔗</a></h2><p>My first contributions involved fixing some typos, broken links and the integration of the <code>go-playground/validator</code>. Later, I had the opportunity to work on adding support for the Elasticsearch protocol. Specifically, my task was to implement the necessary code to allow OBI to recognize a given request/response as belonging to Elasticsearch. To accomplish this, I referred to the <a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/main/devdocs/new-tracer.md" target="_blank" rel="noopener">documentation</a> and followed the guidelines for integrating Elasticsearch. This required studying the OpenTelemetry semantic conventions for <a href="https://opentelemetry.io/docs/specs/semconv/database/elasticsearch/" target="_blank" rel="noopener">Elasticsearch client spans</a>, creating appropriate structs, and parsing the request/response to populate all the relevant fields.</p>
+<p>A special thanks to my team members <a href="https://github.com/NimrodAvni78" target="_blank" rel="noopener">Nimrod</a> and <a href="https://github.com/mmat11" target="_blank" rel="noopener">Mattia</a> at <a href="https://coralogix.com/" target="_blank" rel="noopener"><strong>Coralogix</strong></a> for helping me get up to speed with OBI!</p>
+<p>OBI’s <a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">CONTRIBUTING.md</a> guide is clear, and the community is responsive which makes the onboarding process much smoother.</p>
+<p>If you’re curious about the project, you can start by visiting the <a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation" target="_blank" rel="noopener">GitHub repository</a> and checking out the open issues. There’s also a dedicated discussion channel called <strong>#otel-ebpf-instrumentation</strong> in the <strong>cloud-native.slack.com</strong> workspace.</p>
+<h2 id="learn-more-about-obi">Learn more about OBI <a href="#learn-more-about-obi" class="anchor">🔗</a></h2><p>If you want to learn more about OBI and the ecosystem around it, here are some useful resources:</p>
+<ul>
+<li><a href="https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation" target="_blank" rel="noopener">Github repo</a></li>
+<li><a href="https://www.youtube.com/watch?v=u-J3O5nizuE" target="_blank" rel="noopener">Unveiling OpenTelemetry eBPF Instrumentation</a></li>
+<li><a href="https://www.youtube.com/watch?v=W6_wWrfvRIg" target="_blank" rel="noopener">Auto-Instrument Everything with eBPF: Grafana Beyla + OpenTelemetry in Action | Homelabs</a></li>
+<li><a href="https://www.youtube.com/watch?v=GvcwiiCkMtE" target="_blank" rel="noopener">Auto-Instrumenting Go Libraries for Tracing with eBPF and OpenTelemetry - DevConf.US 2024</a></li>
+<li><a href="https://opentelemetry.io/docs/" target="_blank" rel="noopener">OpenTelemetry Documentation</a></li>
+<li><a href="https://opentelemetry.io/docs/zero-code/obi/" target="_blank" rel="noopener">OpenTelemetry eBPF Instrumentation Documentation</a></li>
+<li><a href="https://coralogix.com/docs/user-guides/ebpf-auto-instrumentation/overview/" target="_blank" rel="noopener">eBPF Application Auto-Instrumentation with OBI</a></li>
+</ul>
+
+    </div>
+    
+
+    
+        <div class="tags">
+            
+                <a href="https://pinoogni.github.io/tags/ebpf">eBPF</a>
+            
+                <a href="https://pinoogni.github.io/tags/c">C</a>
+            
+                <a href="https://pinoogni.github.io/tags/kubernetes">Kubernetes</a>
+            
+                <a href="https://pinoogni.github.io/tags/obi">OBI</a>
+            
+                <a href="https://pinoogni.github.io/tags/opentelemetry">OpenTelemetry</a>
+            
+                <a href="https://pinoogni.github.io/tags/go">Go</a>
+            
+        </div>
+    
+    
+    
+
+</section>
+
+
+    </main>
+    
+    <footer id="footer">
+    
+        <div id="social">
+
+
+    <a class="symbol" href="mailto:ognibenegiuseppe8@gmail.com" rel="me" target="_blank">
+        
+        <svg fill="#bbbbbb" width="28" height="28" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+    <title>Email</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Social-Icons---Rounded-Black" transform="translate(-264.000000, -939.000000)">
+            <g id="Email" transform="translate(264.000000, 939.000000)">
+                <path d="M8,72 L64,72 C68.418278,72 72,68.418278 72,64 L72,8 C72,3.581722 68.418278,-8.11624501e-16 64,0 L8,0 C3.581722,8.11624501e-16 -5.41083001e-16,3.581722 0,8 L0,64 C5.41083001e-16,68.418278 3.581722,72 8,72 Z" id="Rounded" fill="#bbbbbb"></path>
+                <g id="Envelope" fill="#FFFFFF">
+                    <path d="M60,20 L12,20 C10.8954305,20 10,20.8954305 10,22 L10,50 C10,51.1045695 10.8954305,52 12,52 L60,52 C61.1045695,52 62,51.1045695 62,50 L62,22 C62,20.8954305 61.1045695,20 60,20 Z" id="Envelope-Body"></path>
+                    <path d="M60,18 C58.8954305,18 58,18.8954305 58,20 L14,20 C13.1045695,20 12,19.1045695 12,18 L12,4 C12,2.8954305 13.1045695,2 14,2 L58,2 C59.1045695,2 60,2.8954305 60,4 L60,18 Z" id="Envelope-Flap"></path>
+                    <path d="M0,20 L36,36 L72,20 L36,32 L0,20 Z" id="Envelope-Open"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+
+    </a>
+
+    <a class="symbol" href="https://github.com/pinoOgni" rel="me" target="_blank">
+        
+        <svg fill="#bbbbbb" width="28" height="28"  viewBox="0 0 72 72" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    
+    <title>Github</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Social-Icons---Rounded-Black" transform="translate(-264.000000, -939.000000)">
+            <g id="Github" transform="translate(264.000000, 939.000000)">
+                <path d="M8,72 L64,72 C68.418278,72 72,68.418278 72,64 L72,8 C72,3.581722 68.418278,-8.11624501e-16 64,0 L8,0 C3.581722,8.11624501e-16 -5.41083001e-16,3.581722 0,8 L0,64 C5.41083001e-16,68.418278 3.581722,72 8,72 Z" id="Rounded" fill="#bbbbbb"></path>
+                <path d="M35.9985,13 C22.746,13 12,23.7870921 12,37.096644 C12,47.7406712 18.876,56.7718301 28.4145,59.9584121 C29.6145,60.1797862 30.0525,59.4358488 30.0525,58.7973276 C30.0525,58.2250681 30.0315,56.7100863 30.0195,54.6996482 C23.343,56.1558981 21.9345,51.4693938 21.9345,51.4693938 C20.844,48.6864054 19.2705,47.9454799 19.2705,47.9454799 C17.091,46.4500754 19.4355,46.4801943 19.4355,46.4801943 C21.843,46.6503662 23.1105,48.9634994 23.1105,48.9634994 C25.2525,52.6455377 28.728,51.5823398 30.096,50.9649018 C30.3135,49.4077535 30.9345,48.3460615 31.62,47.7436831 C26.2905,47.1352808 20.688,45.0691228 20.688,35.8361671 C20.688,33.2052792 21.6225,31.0547881 23.1585,29.3696344 C22.911,28.7597262 22.0875,26.3110578 23.3925,22.9934585 C23.3925,22.9934585 25.4085,22.3459017 29.9925,25.4632101 C31.908,24.9285993 33.96,24.6620468 36.0015,24.6515052 C38.04,24.6620468 40.0935,24.9285993 42.0105,25.4632101 C46.5915,22.3459017 48.603,22.9934585 48.603,22.9934585 C49.9125,26.3110578 49.089,28.7597262 48.8415,29.3696344 C50.3805,31.0547881 51.309,33.2052792 51.309,35.8361671 C51.309,45.0917119 45.6975,47.1292571 40.3515,47.7256117 C41.2125,48.4695491 41.9805,49.9393525 41.9805,52.1877301 C41.9805,55.4089489 41.9505,58.0067059 41.9505,58.7973276 C41.9505,59.4418726 42.3825,60.1918338 43.6005,59.9554002 C53.13,56.7627944 60,47.7376593 60,37.096644 C60,23.7870921 49.254,13 35.9985,13" fill="#FFFFFF"></path>
+            </g>
+        </g>
+    </g>
+</svg>
+    </a>
+
+    <a class="symbol" href="https://www.linkedin.com/in/giuseppe-ognibene-538930148/" rel="me" target="_blank">
+        
+        <svg width="28" height="28" fill="#bbbbbb" viewBox="0 0 500 500">
+  <g fill="none" fill-rule="evenodd">
+    <rect width="500" height="500" fill="#bbbbbb" rx="50"/>
+    <path fill="#FFF" d="M154.703 100.183c-19.121 0-34.689 15.565-34.703 34.701 0 19.136 15.568 34.704 34.703 34.704 19.128 0 34.688-15.568 34.688-34.704 0-19.134-15.561-34.701-34.688-34.701zm26.045 83.348h-52.094a4.488 4.488 0 0 0-4.488 4.489v167.675a4.488 4.488 0 0 0 4.488 4.488h52.093a4.49 4.49 0 0 0 4.489-4.488V188.02a4.486 4.486 0 0 0-4.488-4.489zm133.176-1.974c-19.064 0-35.817 5.805-46.04 15.271v-8.808c0-2.48-2.01-4.489-4.489-4.489h-49.971a4.489 4.489 0 0 0-4.489 4.489v167.675a4.488 4.488 0 0 0 4.489 4.488h52.044a4.49 4.49 0 0 0 4.489-4.488v-82.957c0-23.802 4.378-38.555 26.227-38.555 21.526.026 23.137 15.846 23.137 39.977v81.535a4.489 4.489 0 0 0 4.49 4.488h52.068a4.489 4.489 0 0 0 4.488-4.488v-91.977c-.001-38.253-7.553-82.161-66.443-82.161z"/>
+  </g>
+</svg>
+
+    </a>
+
+
+</div>
+
+    
+
+    <div class="copyright">
+    
+       © Copyright 
+       2025 
+       <span class="split">
+        <svg fill="#bbbbbb" width="15" height="15" version="1.1" id="heart-15" xmlns="http://www.w3.org/2000/svg" width="15px" height="15px" viewBox="0 0 15 15">
+  <path d="M13.91,6.75c-1.17,2.25-4.3,5.31-6.07,6.94c-0.1903,0.1718-0.4797,0.1718-0.67,0C5.39,12.06,2.26,9,1.09,6.75&#xA;&#x9;C-1.48,1.8,5-1.5,7.5,3.45C10-1.5,16.48,1.8,13.91,6.75z"/>
+</svg>
+       </span>
+       Giuseppe Ognibene
+    
+    </div>
+
+    
+      <div class="powerby">
+        Powered by <a href='http://www.gohugo.io/'>Hugo</a> Theme By <a href='https://github.com/nodejh/hugo-theme-mini'>nodejh</a>
+      </div>
+    
+</footer>
+
+
+
+  </body>
+</html>

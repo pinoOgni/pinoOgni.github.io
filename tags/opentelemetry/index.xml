@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>OpenTelemetry on Giuseppe Ognibene</title>
+    <link>https://pinoogni.github.io/tags/opentelemetry/</link>
+    <description>Recent content in OpenTelemetry on Giuseppe Ognibene</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 01 Nov 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://pinoogni.github.io/tags/opentelemetry/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A new open source journey: OBI</title>
+      <link>https://pinoogni.github.io/articles/a-new-open-source-journey-obi/</link>
+      <pubDate>Sat, 01 Nov 2025 00:00:00 +0000</pubDate>
+      <guid>https://pinoogni.github.io/articles/a-new-open-source-journey-obi/</guid>
+      <description>&lt;div style=&#34;display: flex; justify-content: center;  align-items: center&#34;&gt;&#xA;  &lt;img src=&#34;https://pinoogni.github.io/images/articles/obi-1.png&#34; width=&#34;50%&#34; /&gt;&#xA;&lt;/div&gt;&#xA;&lt;h2 id=&#34;introduction&#34;&gt;Introduction &lt;a href=&#34;#introduction&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;It’s been about a month since I joined the &lt;a href=&#34;https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;OBI&lt;/a&gt; project, and it already feels like one of those journeys where you learn something new every single day.&lt;/p&gt;&#xA;&lt;p&gt;In this post, I’ll give a short introduction to what OBI is, walk through its project structure, show how you can try it out yourself, and share how to get involved. This won’t be a deep technical dive, you can think of it as a friendly overview to get familiar with the project and see it in action for the first time.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
